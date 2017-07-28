@@ -34,24 +34,24 @@ public class StatusHwService extends IntentService{
         clientConnect.connect(ip, port);
         clientConnect.send("info");
 
-        try {
-            state = clientConnect.receive();
-            Log.d(LOG_TAG, "Получено :" + state);
-            Log.d(LOG_TAG, "Пишем в файл :" + state);
-            actions.writeInFile(state, "battery");
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "recieve error");
-            e.printStackTrace();
-        }
-        clientConnect.send("network");
-        try {
-            state = clientConnect.receive();
-            actions.writeInFile(state, "network");
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "recieve error");
-            e.printStackTrace();
-        }
-        clientConnect.send("exit");
+//        try {
+//            state = clientConnect.receive();
+//            Log.d(LOG_TAG, "Получено :" + state);
+//            Log.d(LOG_TAG, "Пишем в файл :" + state);
+//            actions.writeInFile(state, "battery");
+//        } catch (IOException e) {
+//            Log.e(LOG_TAG, "recieve error");
+//            e.printStackTrace();
+//        }
+//        clientConnect.send("network");
+//        try {
+//            state = clientConnect.receive();
+//            actions.writeInFile(state, "network");
+//        } catch (IOException e) {
+//            Log.e(LOG_TAG, "recieve error");
+//            e.printStackTrace();
+//        }
+        clientConnect.send("end");
         try {
             clientConnect.close();
         } catch (IOException e) {
@@ -59,8 +59,8 @@ public class StatusHwService extends IntentService{
             Log.e(LOG_TAG, "Close connection error");
         }
         actions.writeInFile("false", connection);
-        sendBroadcast(intentToMain);
-        Log.d(LOG_TAG, "Broadcasts send");
+//        sendBroadcast(intentToMain);
+//        Log.d(LOG_TAG, "Broadcasts send");
     }
     private boolean getStatus(){
         boolean statusConnection = Boolean.valueOf(actions.readFromFile(connection));

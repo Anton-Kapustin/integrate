@@ -33,7 +33,7 @@ public class MainService extends Service {
         StatusPhoneHwService = new Intent(MainService.this, StatusPhoneHwService.class);
         CommandService = new Intent(MainService.this, CommandService.class);
 
-//        startService(StatusHwService);
+        startService(StatusHwService);
         startService(CommandService);
         startService(StatusPhoneHwService);
         return START_NOT_STICKY;
@@ -59,7 +59,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(LOG_TAG, "Broadcast in service ");
-//            startService(StatusHwService);
+            startService(StatusHwService);
         }
     }
 }
