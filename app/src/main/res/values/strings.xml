@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Integrate</string>
+    <string name="text_status_connection">Status Connection</string>
+    <string name="button_connect">Connect</string>
+    <string name="button_refrash">Refrash</string>
+    <string name="text_battery_status">Battery Status</string>
+    <string name="text_network_status">Network Status</string>
+</resources>
