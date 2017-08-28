@@ -5,4 +5,5 @@
     <string name="button_refrash">Refrash</string>
     <string name="text_battery_status">Battery Status</string>
     <string name="text_network_status">Network Status</string>
+    <string name="lable_backlight">Backlight</string>
 </resources>

@@ -6,14 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.service.notification.NotificationListenerService;
 import android.util.Log;
 
 public class MainService extends Service {
     String LOG_TAG = "MainService";
     serviceBroadcastReceiver receiver;
-    Intent StatusHwService;
-    Intent StatusPhoneHwService;
-    Intent CommandService;
+    String actionRestartService = "com.dev.toxa.integrate.ClientConnect.actionRestartService";
+    Intent statusHwService;
+    Intent statusPhoneHwService;
+    Intent commandService;
+    Intent notifyListenerService;
 
     public MainService(){
     }
@@ -29,20 +32,21 @@ public class MainService extends Service {
         receiver = new serviceBroadcastReceiver();
         registerReceiver(receiver, new IntentFilter(Intent.ACTION_TIME_TICK));
         Log.d(LOG_TAG, "onStartCommand");
-        StatusHwService = new Intent(MainService.this, StatusHwService.class);
-        StatusPhoneHwService = new Intent(MainService.this, StatusPhoneHwService.class);
-        CommandService = new Intent(MainService.this, CommandService.class);
-
-        startService(StatusHwService);
-        startService(CommandService);
-        startService(StatusPhoneHwService);
+        statusHwService = new Intent(MainService.this, StatusHwService.class);
+        statusPhoneHwService = new Intent(MainService.this, StatusPhoneHwService.class);
+        commandService = new Intent(MainService.this, CommandService.class);
+        notifyListenerService = new Intent(MainService.this, NotifyListenerService.class);
+        statusHwService.putExtra("parameters", "firstRun");
+        startService(statusHwService);
+        startService(commandService);
+        startService(statusPhoneHwService);
+        startService(notifyListenerService);
         return START_NOT_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent){
         return null;
-        // TODO: Return the communication channel to the service.
 //        throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -58,8 +62,17 @@ public class MainService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(LOG_TAG, "Broadcast in service ");
-            startService(StatusHwService);
+            String action = intent.getAction();
+            if (action.contains("TIME_TICK")) {
+                Log.i(LOG_TAG, "Broadcast in MainService: " + action);
+                statusHwService.putExtra("parameters", "RunFromReceiver");
+                startService(statusHwService);
+            } else if (action.contains("RestartService")) {
+                Log.i(LOG_TAG, "Broadcast in MainService: " + action);
+                startService(statusHwService);
+            }
         }
     }
 }
+
+

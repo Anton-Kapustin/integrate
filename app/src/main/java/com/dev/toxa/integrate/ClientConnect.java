@@ -1,26 +1,20 @@
 package com.dev.toxa.integrate;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
+import java.io.*;
+import java.net.*;
+import java.nio.charset.Charset;
 
 
 public class ClientConnect {
     final String LOG_TAG = "ClientConnect";
-    private Socket socket;
+    private Socket clientSocket = new Socket();
     private InetAddress ip;
     int port;
-    private DataInputStream in = null;
-    private DataOutputStream out = null;
+//    private DataInputStream in = null;
+//    private DataOutputStream out = null;
+    InputStream in = null;
+    OutputStream out = null;
     private boolean connection = false;
     private String msg = null;
     public boolean closeConnection = false;
@@ -35,28 +29,47 @@ public class ClientConnect {
             e.printStackTrace();
         }
         this.port = port;
+        SocketAddress socketAddress = new InetSocketAddress(ip, port);
+        int timeout = 5000;
         try {
-            openConnection();
+            if (openConnection(socketAddress, timeout)) {
+                try {
+                    start_input_stream();
+                    start_output_stream();
+                    connection = true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    connection = false;
+                }
+            }
+            else {
+                connection = false;
+            }
         } catch (IOException e) {
+            connection = false;
             e.printStackTrace();
             Log.e(LOG_TAG, "Open Connection Error");
         }
-        try {
-            start_input_stream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        start_output_stream();
     }
 
+
     // Открытие соединения
-    public boolean openConnection() throws IOException{
+    public boolean openConnection(SocketAddress socketAddr, int timeOut) throws IOException{
         try {
-            socket = new Socket(ip, port);
+//            clientSocket = new Socket(ip, port);
+            clientSocket.connect(socketAddr, timeOut);
             connection = true;
             Log.d(LOG_TAG, "Подключено");
+        } catch (NoRouteToHostException | ConnectException e) {
+            Log.d(LOG_TAG, "openConnection error: " + e);
+            e.printStackTrace();
+            connection = false;
+        } catch (SocketTimeoutException e) {
+            Log.d(LOG_TAG, "openConnection error: " + e);
+            e.printStackTrace();
+            connection = false;
         } catch (IOException e) {
-            Log.d(LOG_TAG, "openConnection error");
+            Log.d(LOG_TAG, "openConnection error: " + e);
             e.printStackTrace();
             connection = false;
         }
@@ -67,20 +80,24 @@ public class ClientConnect {
     //  Создание входящего потока
     public void start_input_stream() throws IOException {
         try {
-            in = new DataInputStream(socket.getInputStream());  // Создание потока на прием
+            in = clientSocket.getInputStream();
+//            in = new DataInputStream(clientSocket.getInputStream());  // Создание потока на прием
             Log.d(LOG_TAG, "Создан входящий поток");
         }
         catch (IOException e) {
-            System.err.println("start_input_stream error");
+            Log.e(LOG_TAG,"start_input_stream error: " + e);
             connection = false;
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            Log.e(LOG_TAG,"start_input_stream error: " + e);
         }
     }
 
     //  Создание исходящего потока
     public void start_output_stream() {
         try {
-            out = new DataOutputStream(socket.getOutputStream());
+            out = clientSocket.getOutputStream();
+//            out = new DataOutputStream(clientSocket.getOutputStream());
             Log.d(LOG_TAG, "Создан исходящий поток");
 
         } catch (IOException e) {
@@ -92,23 +109,20 @@ public class ClientConnect {
     //  Чтение из потока
     public String receive() throws IOException {
         String str = null;
-        try {
-            Log.d(LOG_TAG, "Чтение из потока");
-            str = in.readUTF ();
-            Log.d(LOG_TAG, "Прочитано : " + str);
-        }
-        catch (IOException e) {
-            System.err.println("receive error");
-        }
+        Log.d(LOG_TAG, "Чтение из потока");
+//            str = in.readUTF ();
+        Log.d(LOG_TAG, "Прочитано : " + str);
         return str;
     }
 
     //  Запись в исходящий поток
     public void send(String msg) {
+        msg = msg + "\n";
         try {
             Log.d(LOG_TAG, "Отправка : " + msg);
             if (out != null){
-                out.writeUTF(msg);  // Отправка сообщения
+                byte[] b = msg.getBytes(Charset.forName("UTF-8"));
+                out.write(b);  // Отправка сообщения
                 Log.d(LOG_TAG, "Отправлено");
                 out.flush();    // Очистка буфера
             }
@@ -120,9 +134,10 @@ public class ClientConnect {
 
     }
 
-    public DataInputStream getInput() {
-        return in;
-    }
+
+//    public DataInputStream getInput() {
+//        return in;
+//    }
     //  Закрытие соединения
     public void close() throws IOException{
         try {
@@ -131,7 +146,7 @@ public class ClientConnect {
         catch (NullPointerException e) {
             Log.d(LOG_TAG, "out closed");
         }
-        if (socket.isOutputShutdown()){
+        if (clientSocket.isOutputShutdown()){
             Log.d(LOG_TAG, "Закрыт исходящий поток");
         }
         try {
@@ -140,15 +155,15 @@ public class ClientConnect {
         catch (NullPointerException e) {
             Log.d(LOG_TAG, "in closed");
         }
-        if (socket.isInputShutdown()){
+        if (clientSocket.isInputShutdown()){
             Log.d(LOG_TAG, "Закрыт входящий поток");
         }
-        socket.close();
-        if (socket.isClosed()){
+        clientSocket.close();
+        if (clientSocket.isClosed()){
             Log.d(LOG_TAG, "Соединение разоравано");
         }
     }
-    public boolean connectionState() {
+    public boolean getConnectionState() {
         return connection;
     }
 

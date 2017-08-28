@@ -1,23 +1,29 @@
 package com.dev.toxa.integrate;
 
 import android.util.Log;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerConnect {
     String LOG_TAG = "ServerConnect";
     private int port;
     private ServerSocket serverSocket = null;
-    private Socket clientSocket = null;
-    private DataInputStream in = null;
-    private DataOutputStream out = null;
+    private Socket socket = null;
+//    private DataInputStream inString = null;
+//    private DataOutputStream outString = null;
+//    private ObjectInputStream inObject = null;
+//    private ObjectOutputStream outObject = null;
+    InputStream inString = null;
+    OutputStream outString =null;
     public boolean connection = false;
     String message = null;
     String cmd = null;
@@ -25,88 +31,135 @@ public class ServerConnect {
 
     public ServerConnect(int port) throws IOException {
         serverSocket = new ServerSocket(port);
+        Log.d(LOG_TAG, "New Server");
     }
 
     //  Старт сервера на порту
-    public void connect() throws IOException {
+    public void connect() {
         try {
-            clientSocket = serverSocket.accept();   //  Подключение клиента
+            Log.d(LOG_TAG,"Ожидание подключения");
+            socket = serverSocket.accept();   //  Подключение клиента
+            Log.d(LOG_TAG,"Подключено");
         } catch (SocketException e) {
-            System.err.println("Connect error");
+            Log.e(LOG_TAG,"Connect error" + e);
             connection = false;
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Connect error" + e);
+            e.printStackTrace();
         }
+        Log.d(LOG_TAG, "Открытие потоков");
         connection = true;
         start_output_stream();
-        start_input_stream();
-    }
-
-    // Прием сообщения
-    public void start_input_stream() throws IOException {
         try {
-            in = new DataInputStream(clientSocket.getInputStream()); // Создание потока данных приема
-        } catch (SocketException e) {
-            connection = false;
-            System.err.println(e);
-            in.close();
+            start_input_stream();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Start input stream error" + e);
+            e.printStackTrace();
         }
     }
 
-    public String receive() throws IOException {
+    private void start_input_stream() throws IOException {
+        try {
+            inString = socket.getInputStream();
+//            inString = new DataInputStream(socket.getInputStream());  // Создание потока на прием
+        }
+        catch (IOException e) {
+            System.err.println(LOG_TAG + "start_input_stream error");
+            connection = false;
+            e.printStackTrace();
+        }
+//        try {
+//            inObject = new ObjectInputStream(socket.getInputStream());
+//            Log.d(LOG_TAG, "Создан входящий поток");
+//        } catch (IOException e) {
+//            Log.e(LOG_TAG, "Start input stream error" + e);
+//        }
+    }
+
+    private void start_output_stream() {
+        try {
+            outString = socket.getOutputStream();
+//            outString = new DataOutputStream(socket.getOutputStream());   // Созадание потока на отпраку
+
+        } catch (IOException e) {
+            System.err.println(LOG_TAG + "start_output_stream error");
+            connection = false;
+            e.printStackTrace();
+        }
+//        try {
+//            outObject = new ObjectOutputStream(socket.getOutputStream());
+//            Log.d(LOG_TAG, "Создан исходящий поток");
+//        } catch (IOException e) {
+//            Log.e(LOG_TAG, "Start output stream error" + e);
+//        }
+    }
+
+    public JSONObject receive() throws IOException {
+        JSONObject jsonObject = null;
         try {
             Log.d(LOG_TAG,"Получение");
-//            if(!clientSocket.isInputShutdown()) {
-                cmd = in.readUTF();
-                Log.d(LOG_TAG,"Получено");
-                if(cmd != null) {
-                    Log.d(LOG_TAG,"Получено: " + cmd);
-                } else {
-                    Log.d(LOG_TAG,"Null");
-                }
-//            } else {
-//                in.close();
-//                clientSocket.close();
-//            }
+//            if(!socket.isInputShutdown()) {
+//                cmd = inString.readUTF();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] bytes = new byte[16384];
+            int count;
+            while ((count = inString.read(bytes)) != -1) {
+                byteArrayOutputStream.write(bytes, 0, count);
+            }
+            jsonObject = new JSONObject(byteArrayOutputStream.toString());
+
+            Log.d(LOG_TAG, "Получено: " + jsonObject.toString());
         }
         catch(EOFException e) {
-            Log.d(LOG_TAG,"receive error");
-            this.clientSocket.close();
+            Log.d(LOG_TAG, "receive error");
+            this.socket.close();
             return null;
-        }
-        return cmd;
-
-    }
-
-    // Отправка сообщения
-    public void start_output_stream() throws IOException {
-
-        try {
-            out = new DataOutputStream(clientSocket.getOutputStream()); //  Создание потока данных отправки
-        } catch (IOException e) {
-            connection = false;
-            System.err.println(e);
+        } catch (JSONException e) {
+            Log.d(LOG_TAG, "Json error: " + e);
+            e.printStackTrace();
         }
 
+        return jsonObject;
     }
+
+//    public Map<String, String> receive() {
+//        Map msg = new HashMap<String, String>();
+//        Log.d(LOG_TAG, "Получение");
+//        Object obj =null;
+//        try {
+//            obj = inObject.readObject();
+//        } catch (IOException e) {
+//            Log.e(LOG_TAG, "receive error" + e);
+//            e.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            Log.e(LOG_TAG, "receive error" + e);
+//            e.printStackTrace();
+//        }
+//        msg = (Map) obj;
+//        return msg;
+//    }
 
     public void send(String message) throws IOException {
         try {
-            out.writeUTF(message);  //  Отпрака сообщения
+//            outString.writeUTF(message);  //  Отпрака сообщения
             Log.d(LOG_TAG, "Отправка");
-            out.flush();    //  Очистка буфера
+            outString.flush();    //  Очистка буфера
         }
         catch (IOException e) {
             Log.e(LOG_TAG, "send error");
         }
     }
 
-    public DataInputStream getInput() {
-        return in;
-    }
+//    public ObjectInputStream getInput() {
+//        return inObject;
+//    }
 
     public void close() throws IOException {
-        out.close();
-        in.close();
-        clientSocket.close();
+//        inObject.close();
+//        outObject.close();
+        outString.close();
+        inString.close();
+        socket.close();
         serverSocket.close();
     }
 

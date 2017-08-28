@@ -48,7 +48,7 @@ public class ActionsWithFile {
         }
         return state;
     }
-    public void writeInFile(String state, String filename) {
+    public void writeToFile(String state, String filename) {
         File file = null;
         if (filename.contains("battery")){
             file = batteryFile;
@@ -62,6 +62,30 @@ public class ActionsWithFile {
         try{
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(state);
+            bufferedWriter.close();
+            Log.d(LOG_TAG, "Записано : " + state + " в : " + file);
+        } catch (IOException e){
+            Log.d(LOG_TAG, "write to file error");
+            e.printStackTrace();
+        }
+    }
+
+    public void writeToFile(Object state, Object filename) {
+        File file = null;
+        String status = (String) state;
+        String flname = (String) filename;
+        if (flname.contains("battery")){
+            file = batteryFile;
+        } else if (flname.contains("network")) {
+            file = networkFile;
+        } else if (flname.contains("status")) {
+            file = statusFile;
+        } else if (flname.contains("connection")) {
+            file = connectionFile;
+        }
+        try{
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            bufferedWriter.write(status);
             bufferedWriter.close();
             Log.d(LOG_TAG, "Записано : " + state + " в : " + file);
         } catch (IOException e){
