@@ -1,0 +1,36 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="layout.FragmentListServers">
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="10dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_searchServer" android:layout_gravity="center_vertical|center_horizontal">
+
+            <TextView
+                android:text="@string/available_devices"
+                android:layout_width="wrap_content" android:layout_centerHorizontal="true"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_servers" android:gravity="center"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:id="@+id/layout_listServers"
+                android:layout_below="@id/text_servers"
+                android:layout_alignParentStart="false"
+                android:layout_gravity="right|center_vertical"
+                android:gravity="center_vertical"
+                android:layout_alignParentLeft="false"
+                tools:ignore="RtlHardcoded,UseCompoundDrawables">
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+</FrameLayout>

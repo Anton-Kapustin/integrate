@@ -3,23 +3,28 @@ package com.dev.toxa.integrate;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 public class StatusPhoneHwService extends IntentService {
     final String LOG_TAG = "statusPhoneHwService";
-    String actionUpdateData = "com.dev.toxa.integrate.StatusPhoneHwService.UpdateData";
-    Intent sendInfoIntent = new Intent("com.dev.toxa.integrate.StatusHwPhoneState.Info");
-    Intent intentUpdateData = new Intent(actionUpdateData);
+
+    String actionToFragmentConnectToServer = "com.dev.toxa.integrate.FragmentConnectToServer";
+    String actionToCommnadService = "com.dev.toxa.integrate.CommnadService";
+
+    Intent intentToCommandService = new Intent(actionToCommnadService);
+    Intent intentFragmentConnectToServer = new Intent(actionToFragmentConnectToServer);
+
     ServerConnect server = null;
     ActionsWithFile actions = new ActionsWithFile();
+
     String batteryFile = "battery";
     String networkFile = "network";
+    String parameters = "parameters";
     String state = null;
     String battery = null;
     String network = null;
@@ -53,55 +58,22 @@ public class StatusPhoneHwService extends IntentService {
             JSONObject jsonReceive = null;
             try {
                 jsonReceive = server.receive();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (jsonReceive.has("phone")) {
-                sendBroadcast(sendInfoIntent);
-                if (jsonReceive.has("battery")) {
-                    intentUpdateData.putExtra("parameters", jsonReceive.toString());
-                    sendBroadcast(intentUpdateData);
+                if (jsonReceive.has("phone")) {
+                    intentToCommandService.putExtra(parameters, "phone");
+                    sendBroadcast(intentToCommandService);
+                }
+                if (jsonReceive.has("PC_info")) {
+                    intentFragmentConnectToServer.putExtra("parameters", "updateData");
+                    intentFragmentConnectToServer.putExtra("data", jsonReceive.toString());
+                    Log.d(LOG_TAG, "Получено: " + jsonReceive.toString());
+                    sendBroadcast(intentFragmentConnectToServer);
                     actions.writeToFile(jsonReceive.toString(), batteryFile);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e) {
+                Log.d(LOG_TAG, "null error: " + e);
             }
-
-
-//            Set<Map.Entry> set = cmd.entrySet();
-//            for (Map.Entry entry : set) {
-//                if (Arrays.asList(array).contains(entry.getKey())) {
-//                    actions.writeToFile(entry.getValue(), entry.getKey());
-//                } else if (entry.getKey().equals("phone")) {
-//                    sendBroadcast(sendInfoIntent);
-//                    Log.d(LOG_TAG, "Broadcast to Command service");
-//                }
-//            }
-            //                        Log.d(LOG_TAG, "Получено: " + cmd);
-            //                    if (cmd.contains("end")){
-            //                        break;
-            //                    } else if (cmd.contains("phone")) {
-            //                        sendBroadcast(sendInfoIntent);
-            //                        Log.d(LOG_TAG, "Broadcast to Command service");
-            //
-            //                        Log.d(LOG_TAG, "Broadcast to Command Service receive");
-            //                    } else if (cmd.contains("battery")) {
-            //                        Log.d(LOG_TAG, cmd);
-            //                        str[0] = cmd;
-            //                    } else if (cmd.contentEquals("network")) {
-            //                        Log.d(LOG_TAG, cmd);
-            //                        str[0] = cmd;
-            //                    } else {
-            //                        str[1] = cmd;
-            //                        if(str[0].contains("battery")) {
-            //                            actions.writeToFile(str[1], batteryFile);
-            //                        } else if (str[0].contains("network")) {
-            //                            actions.writeToFile(str[1], networkFile);
-            //                        }
-            //                    }
-            //                } catch (IOException e) {
-            //                    Log.d(LOG_TAG, "server receive error");
-            //                    e.printStackTrace();
-            //                }
-
             try {
                 server.close();
             } catch (IOException e) {

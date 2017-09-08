@@ -10,7 +10,11 @@ import java.lang.reflect.Array;
 public class StatusHwService extends IntentService{
     final String LOG_TAG = "statusHwService";
     final int port = 18030;
-    final String ip = "192.168.88.73";
+
+    String actionToMainService = "com.dev.toxa.integrate.MainService";
+
+    Intent intentToMainService = new Intent(actionToMainService);
+
     String batteryFile = "battery";
     String networkFile = "network";
     String backlight = "backlight";
@@ -19,10 +23,7 @@ public class StatusHwService extends IntentService{
     String state = null;
     String connection = "connection";
     String status = "status";
-    String actionButton = "com.dev.toxa.integrate.ClientConnect.actionButton";
-    String actionRestartService = "com.dev.toxa.integrate.ClientConnect.actionRestartService";
-    Intent intentToMainButton = new Intent(actionButton);
-    Intent intentToMainService = new Intent(actionRestartService);
+
     ClientConnect clientConnect;
 
     final ActionsWithFile actions = new ActionsWithFile();
@@ -38,101 +39,98 @@ public class StatusHwService extends IntentService{
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String action = intent.getAction();
-        String params = intent.getStringExtra("parameters");
-        if (params.contains("firstRun")) {
-            intentToMainButton.putExtra("parameters", "Button_connect_disable");
-            sendBroadcast(intentToMainButton);
-            Log.d(LOG_TAG, "send intent: Button_connect_disable");
-        }
-        Log.d(LOG_TAG, "Запуск клиента");
-        clientConnect = new ClientConnect();
-        clientConnect.connect(ip, port);
-        if (clientConnect.getConnectionState()) {
-//            if (parameters.contains("firstRun")) {
-            intentToMainButton.putExtra("parameters", "Button_connect_close");
-            sendBroadcast(intentToMainButton);
-            Log.d(LOG_TAG, "send intent: Button_connetct_close");
-//            }
-            if (intent.getAction() != null) {
-                Log.d(LOG_TAG, "intent.getAction(): " + intent.getAction());
-                if ((intent.getAction()).contains("Info.Send")) {
-                    Log.d(LOG_TAG, "Содержит");
-//                    Bundle bundle = new Bundle();
-//                    bundle = intent.getExtras();
-                    Log.d(LOG_TAG, intent.getAction());
+        try {
+            String action = intent.getAction();
+            String params = intent.getStringExtra("parameters");
+            String ip = intent.getStringExtra("IP");
+            Log.d(LOG_TAG, "IP: " + ip);
+            Log.d(LOG_TAG, "Запуск клиента");
+            clientConnect = new ClientConnect();
+            clientConnect.connect(ip, port);
+            if (clientConnect.getConnectionState()) {
+                try {
                     Log.d(LOG_TAG, params);
-                    try {
-                        Log.d(LOG_TAG, params);
-                        if (params.contains("light")) {
-                            Log.d(LOG_TAG, "2");
-                            int i = 0;
-                            int back = intent.getIntExtra("light", i);
-                            String backlightState = backlight + " " + String.valueOf(back);
-                            clientConnect.send(backlightState);
-                            clientConnect.send("end");
-                        }
-                    } catch (NullPointerException e) {
-                        Log.d(LOG_TAG, "Нет параметра " + backlight);
+                    if (params.contains("backlight")) {
+                        Log.d(LOG_TAG, "2");
+                        int back = intent.getIntExtra("data", -1);
+                        String backlightState = backlight + " " + String.valueOf(back);
+                        clientConnect.send(backlightState);
+                        
+                        close();
                     }
-                    try {
-                        if (params.contains("phoneInfo")) {
-                            String status = intent.getStringExtra("bat");
-//                            Log.d(LOG_TAG, "Отправка: " + status);
-//                            clientConnect.send(status);
-//                            clientConnect.send("end");
-//                            Log.d(LOG_TAG, "Отправлено");
-                            status += "&";
-                            status += intent.getStringExtra("net");
-                            Log.d(LOG_TAG, "Отправка: " + status.toString());
-                            clientConnect.send(status);
-                            clientConnect.send("end");
-                            Log.d(LOG_TAG, "Отправлено");
-//                            Log.d(LOG_TAG, intent.getStringExtra("net"));
-                            close();
-                        }
-                    } catch (NullPointerException e) {
-                        Log.d(LOG_TAG, "Нет параметра " + phoneInfo);
-                    }
-                    try {
-                        if (params.contains("sound")) {
-                            int i = 0;
-                            String soundState = String.valueOf(intent.getIntExtra("snd", i));
-                            String status = "sound: " + soundState;
-                            Log.d(LOG_TAG, "Отправка: " + status);
-                            clientConnect.send(status);
-                            clientConnect.send("end");
-                            Log.d(LOG_TAG, "Отправлено");
-                            close();
-                        }
-                    } catch (NullPointerException e) {
-                        Log.d(LOG_TAG, "Нет параметра " + "sound");
-                    }
-                    try {
-                        if (params.contains("notification")) {
-                            String notification = intent.getStringExtra("notify");
-                            String notify = "notify/ " + notification;
-                            clientConnect.send(notify);
-                            clientConnect.send("end");
-                        }
-                    } catch (NullPointerException e) {
-                        Log.d(LOG_TAG, "Нет параметра " + "sound");
-                    }
+                } catch (NullPointerException e) {
+                    Log.d(LOG_TAG, "Нет параметра " + backlight);
                 }
-            } else {
-                Log.d(LOG_TAG, "Не содержит");
-                clientConnect.send("info");
-                clientConnect.send("end");
-                Log.d(LOG_TAG, "Сообщение отправлено");
-                close();
+                try {
+                    if (params.contains("phone_info")) {
+                        String status = intent.getStringExtra("bat");
+                        status += "&";
+                        status += intent.getStringExtra("net");
+                        Log.d(LOG_TAG, "Отправка: " + status.toString());
+                        clientConnect.send(status);
+                        
+                        Log.d(LOG_TAG, "Отправлено");
+                        close();
+                    }
+                } catch (NullPointerException e) {
+                    Log.d(LOG_TAG, "Нет параметра " + phoneInfo);
+                }
+                try {
+                    if (params.contains("sound")) {
+                        String soundState = String.valueOf(intent.getIntExtra("data", -1));
+                        String status = "sound: " + soundState;
+                        Log.d(LOG_TAG, "Отправка: " + status);
+                        clientConnect.send(status);
+                        
+                        Log.d(LOG_TAG, "Отправлено");
+                        close();
+                    }
+                } catch (NullPointerException e) {
+                    Log.d(LOG_TAG, "Нет параметра " + "sound");
+                }
+                try {
+                    if (params.contains("notify")) {
+                        String name = intent.getStringExtra("name");
+                        String title = intent.getStringExtra("title");
+                        String text = intent.getStringExtra("text");
+                        String notify = "notify/name: " + name + "/ " + "title: " + title + "/ " + "text: " + text;
+                        clientConnect.send(notify);
+                        
+                        close();
+                    }
+                } catch (NullPointerException e) {
+                    Log.d(LOG_TAG, "Нет параметра " + "notify");
+                }
+                try {
+                    if (params.contains("share")) {
+                        String share = intent.getStringExtra("data");
+                        share = "share " + share;
+                        clientConnect.send(share);
+                        
+                        close();
+
+                    }
+                } catch (NullPointerException e) {
+                    Log.d(LOG_TAG, "Нет параметра " + "share");
+                }
+                if (params.contains("connect")) {
+                    Log.d(LOG_TAG, "Не содержит");
+                    clientConnect.send("info");
+                    
+                    Log.d(LOG_TAG, "Сообщение отправлено");
+                    close();
+                }
             }
-
-        } else {
-            intentToMainService.putExtra("parameters", "firstRun");
+            clientConnect.close();
+        } catch (NullPointerException e) {
+            Log.e(LOG_TAG, "IP error: " + e);
+            intentToMainService.putExtra("parameters", "restart");
             sendBroadcast(intentToMainService);
-            Log.d(LOG_TAG, "send intent: Restart HwService");
+            Log.e(LOG_TAG, "send intent: Restart HwService");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG, "clientConnect close: " + e);
         }
-
     }
 
     private void close() {

@@ -10,13 +10,20 @@ import android.service.notification.NotificationListenerService;
 import android.util.Log;
 
 public class MainService extends Service {
+
     String LOG_TAG = "MainService";
+
     serviceBroadcastReceiver receiver;
-    String actionRestartService = "com.dev.toxa.integrate.ClientConnect.actionRestartService";
+
+    String actionToMainService = "com.dev.toxa.integrate.MainService";
+    String IP = null;
+    String parameters = "parameters";
+
     Intent statusHwService;
     Intent statusPhoneHwService;
     Intent commandService;
     Intent notifyListenerService;
+    Intent serverSearchService;
 
     public MainService(){
     }
@@ -30,46 +37,90 @@ public class MainService extends Service {
 
     public int onStartCommand(Intent intent, int flags, int startId) {
         receiver = new serviceBroadcastReceiver();
-        registerReceiver(receiver, new IntentFilter(Intent.ACTION_TIME_TICK));
-        Log.d(LOG_TAG, "onStartCommand");
+//        registerReceiver(receiver, new IntentFilter(actionMainServiceConnect));
+//        registerReceiver(receiver, new IntentFilter(actionRestartService));
+//        registerReceiver(receiver, new IntentFilter(actionToMainServicePhoneInfo));
         statusHwService = new Intent(MainService.this, StatusHwService.class);
         statusPhoneHwService = new Intent(MainService.this, StatusPhoneHwService.class);
         commandService = new Intent(MainService.this, CommandService.class);
         notifyListenerService = new Intent(MainService.this, NotifyListenerService.class);
-        statusHwService.putExtra("parameters", "firstRun");
-        startService(statusHwService);
-        startService(commandService);
-        startService(statusPhoneHwService);
-        startService(notifyListenerService);
+        registerReceiver(receiver, new IntentFilter(actionToMainService));
+        serverSearchService = new Intent(MainService.this, ServerSearchService.class);
+        startService(serverSearchService);
         return START_NOT_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent){
         return null;
-//        throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    public void connectToServer(Intent broadcastIntent) {
+        broadcastIntent.setClass(MainService.this, StatusHwService.class);
+        broadcastIntent.putExtra("IP", IP);
+        Log.d(LOG_TAG, "IP: " + IP);
+        startService(broadcastIntent);
+    }
+
+    public void connectToServer() {
+        statusHwService.putExtra("IP", IP);
+        Log.d(LOG_TAG, "IP: " + IP);
+        startService(statusHwService);
+    }
+
+    public void startServices(){
+        registerReceiver(receiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+        Log.d(LOG_TAG, "Запуск сервисов");
+        statusHwService.putExtra("parameters", "connect");
+        statusHwService.putExtra("IP", IP);
+        Log.d(LOG_TAG, "Запуск сервисов");
+        Log.d(LOG_TAG, "IP: " + IP);
+        startService(statusHwService);
+        startService(commandService);
+        startService(statusPhoneHwService);
+        startService(notifyListenerService);
+    }
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(receiver);
+//        unregisterReceiver(receiver);
         Log.d(LOG_TAG, "Main Service остановлен");
         super.onDestroy();
     }
 
     public class serviceBroadcastReceiver extends BroadcastReceiver {
-
+        String parameters = "parameters";
+        int count = 0;
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action.contains("TIME_TICK")) {
-                Log.i(LOG_TAG, "Broadcast in MainService: " + action);
-                statusHwService.putExtra("parameters", "RunFromReceiver");
-                startService(statusHwService);
-            } else if (action.contains("RestartService")) {
-                Log.i(LOG_TAG, "Broadcast in MainService: " + action);
-                startService(statusHwService);
+            try {
+                String action = intent.getAction();
+                String params = intent.getStringExtra(parameters);
+                Log.d(LOG_TAG, "Broadcast in MainService: " + action);
+                if (action.contains("TIME_TICK")) {
+                    Log.i(LOG_TAG, "Broadcast in MainService: " + action);
+                    connectToServer();
+                }
+                if (params.contains("restart")) {
+                    Log.d(LOG_TAG, "Параметры для заруска: " + params);
+                    Log.d(LOG_TAG, "Попытки перезапуска: " + count);
+                    if (count < 6) {
+                        Log.i(LOG_TAG, "Broadcast в MainService: Перезапуск StatusHwService");
+                        connectToServer();
+                        count++;
+                    }
+                } else if (params.contains("selectServer")) {
+                    Log.d(LOG_TAG, "Параметры для заруска: " + params);
+                    IP = intent.getStringExtra("ip");
+                    Log.d(LOG_TAG, "Подготовка клиента для подключения к :" + IP);
+                    count = 0;
+                    startServices();
+                } else if (params.contains("backlight") || params.contains("sound") || params.contains("notify") || params.contains("phone_info") || params.contains("share")) {
+                    Log.d(LOG_TAG, "Параметры для заруска: " + params);
+                    connectToServer(intent);
+                }
+            } catch (NullPointerException e) {
+            Log.e(LOG_TAG, "onReceive error" + e);
             }
         }
     }

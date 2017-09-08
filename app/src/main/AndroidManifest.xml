@@ -44,10 +44,42 @@
                 android:enabled="true"
                 android:exported="true"
                 android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-                <intent-filter>
-                    <action android:name="android.service.notification.NotificationListenerService" />
-                </intent-filter>
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService"/>
+            </intent-filter>
         </service>
+        <service
+                android:name=".ServerSearchService"
+                android:exported="false">
+        </service>
+
+        <activity
+                android:name=".ActivitySharing"
+                android:label="@string/title_activity_sharing"
+                android:theme="@style/AppTheme">
+            <intent-filter android:label="Send to PC">
+                <action android:name="android.intent.action.SEND"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="image/*"/>
+            </intent-filter>
+            <intent-filter android:label="Send to PC">
+                <action android:name="android.intent.action.SEND"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+            <intent-filter android:label="Send to PC">
+                <action android:name="android.intent.action.SEND_MULTIPLE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="image/*"/>
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

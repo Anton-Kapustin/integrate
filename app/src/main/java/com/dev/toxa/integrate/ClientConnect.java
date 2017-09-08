@@ -23,32 +23,33 @@ public class ClientConnect {
 
 
     public void connect(String ip, int port) {
-        try {
-            this.ip = InetAddress.getByName(ip);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        this.port = port;
-        SocketAddress socketAddress = new InetSocketAddress(ip, port);
-        int timeout = 5000;
-        try {
-            if (openConnection(socketAddress, timeout)) {
-                try {
-                    start_input_stream();
-                    start_output_stream();
-                    connection = true;
-                } catch (IOException e) {
-                    e.printStackTrace();
+        if (ip != null) {
+            try {
+                this.ip = InetAddress.getByName(ip);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+            this.port = port;
+            SocketAddress socketAddress = new InetSocketAddress(ip, port);
+            int timeout = 5000;
+            try {
+                if (openConnection(socketAddress, timeout)) {
+                    try {
+                        start_input_stream();
+                        start_output_stream();
+                        connection = true;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        connection = false;
+                    }
+                } else {
                     connection = false;
                 }
-            }
-            else {
+            } catch (IOException e) {
                 connection = false;
+                e.printStackTrace();
+                Log.e(LOG_TAG, "Open Connection Error");
             }
-        } catch (IOException e) {
-            connection = false;
-            e.printStackTrace();
-            Log.e(LOG_TAG, "Open Connection Error");
         }
     }
 
@@ -117,7 +118,8 @@ public class ClientConnect {
 
     //  Запись в исходящий поток
     public void send(String msg) {
-        msg = msg + "\n";
+        msg = msg.replace("\n", "").replace("\r", "");
+        Log.d(LOG_TAG, "msg: " + msg);
         try {
             Log.d(LOG_TAG, "Отправка : " + msg);
             if (out != null){
@@ -126,9 +128,7 @@ public class ClientConnect {
                 Log.d(LOG_TAG, "Отправлено");
                 out.flush();    // Очистка буфера
             }
-            else {}
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.err.println("send error");
         }
 
