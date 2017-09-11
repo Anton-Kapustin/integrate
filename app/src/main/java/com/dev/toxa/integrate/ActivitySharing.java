@@ -10,7 +10,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ActivitySharing extends AppCompatActivity {
 
@@ -48,9 +51,20 @@ public class ActivitySharing extends AppCompatActivity {
     void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
-            Log.d(LOG_TAG, "text: " + sharedText);
+            String [] arr = sharedText.split(" ");
             intentToCommandServer.putExtra(parameters, "share");
-            intentToCommandServer.putExtra("data", sharedText);
+            Bundle bundle = new Bundle();
+            if (arr[0].contains("http://") || arr[0].contains("https://") || arr[0].contains("ftp://")) {
+                Log.d(LOG_TAG, "link: " + sharedText);
+                bundle.putString("link", sharedText);
+//                intentToCommandServer.putExtra("data", sharedText);
+            } else {
+                Log.d(LOG_TAG, "text: " + sharedText);
+                bundle.putString("text", sharedText);
+//                intentToCommandServer.putExtra(parameters, "share_text");
+//                intentToCommandServer.putExtra("data", sharedText);
+            }
+            intentToCommandServer.putExtras(bundle);
             sendBroadcast(intentToCommandServer);
         }
         Log.d(LOG_TAG, "finish");

@@ -3,6 +3,7 @@ package com.dev.toxa.integrate;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -53,7 +54,7 @@ public class StatusHwService extends IntentService{
                     if (params.contains("backlight")) {
                         Log.d(LOG_TAG, "2");
                         int back = intent.getIntExtra("data", -1);
-                        String backlightState = backlight + " " + String.valueOf(back);
+                        String backlightState = backlight + "//// " + String.valueOf(back);
                         clientConnect.send(backlightState);
                         
                         close();
@@ -63,7 +64,7 @@ public class StatusHwService extends IntentService{
                 }
                 try {
                     if (params.contains("phone_info")) {
-                        String status = intent.getStringExtra("bat");
+                        String status = "phone_info////" + intent.getStringExtra("bat");
                         status += "&";
                         status += intent.getStringExtra("net");
                         Log.d(LOG_TAG, "Отправка: " + status.toString());
@@ -78,7 +79,7 @@ public class StatusHwService extends IntentService{
                 try {
                     if (params.contains("sound")) {
                         String soundState = String.valueOf(intent.getIntExtra("data", -1));
-                        String status = "sound: " + soundState;
+                        String status = "sound//// " + soundState;
                         Log.d(LOG_TAG, "Отправка: " + status);
                         clientConnect.send(status);
                         
@@ -93,7 +94,7 @@ public class StatusHwService extends IntentService{
                         String name = intent.getStringExtra("name");
                         String title = intent.getStringExtra("title");
                         String text = intent.getStringExtra("text");
-                        String notify = "notify/name: " + name + "/ " + "title: " + title + "/ " + "text: " + text;
+                        String notify = "notify////name: " + name + "/ " + "title: " + title + "/ " + "text: " + text;
                         clientConnect.send(notify);
                         
                         close();
@@ -103,10 +104,18 @@ public class StatusHwService extends IntentService{
                 }
                 try {
                     if (params.contains("share")) {
-                        String share = intent.getStringExtra("data");
-                        share = "share " + share;
+                        String share = "share_";
+                        Bundle bundle = new Bundle();
+                        bundle = intent.getExtras();
+                        for (String key : bundle.keySet()) {
+                            Log.d(LOG_TAG, "key: " + key);
+                            if (key.equals("link")) {
+                                share += key + "////" + bundle.getString(key);
+                            } else if (key.equals("text")) {
+                                share += key + "////" + bundle.getString(key);
+                            }
+                        }
                         clientConnect.send(share);
-                        
                         close();
 
                     }
