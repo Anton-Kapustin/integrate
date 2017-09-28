@@ -41,11 +41,15 @@ public class NotifyListenerService extends NotificationListenerService {
 //        String[] name = appName.split(".");
 //        int index = name.length - 1;
 //        appName = name[index];
-            Log.d(LOG_TAG, appName);
-            Log.d(LOG_TAG, title);
-            Log.d(LOG_TAG, text);
+            Log.d(LOG_TAG, "name: " + appName);
+            Log.d(LOG_TAG, "title: " + title);
+            Log.d(LOG_TAG, "text: " + text);
+            if (appName.contains("android.dialer")) {
+                notifySend.putExtra("call", appName);
+            } else {
+                notifySend.putExtra("name", appName);
+            }
             notifySend.putExtra("parameters", "notify");
-            notifySend.putExtra("name", appName);
             notifySend.putExtra("title", title);
             notifySend.putExtra("text", text);
             Log.d(LOG_TAG, "Notify: " + text);

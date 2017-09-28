@@ -22,7 +22,10 @@ public class ServerSearchService extends IntentService {
 
     public void receiveBroadcast() {
         DatagramSocket socketBroadcast = null;
+
         try {
+            String PCName = null;
+            String distr = null;
             socketBroadcast = new DatagramSocket(18032);
             Log.d(LOG_TAG,"Создан сервер udp");
             byte[] buffer = new byte[256];
@@ -41,15 +44,19 @@ public class ServerSearchService extends IntentService {
                 for (int i = 0; i < array.length; i++){
                     if (array[i].contains("name")) {
                         Log.d(LOG_TAG, array[i].toString());
-                        String name = array[i].replaceAll("name: ", "");
-                        Log.d(LOG_TAG, "name: " + name);
-                        Intent intentToMainService = new Intent(actionToFragmentListServers);
-                        intentToMainService.putExtra("parameters", "foundServer");
-                        intentToMainService.putExtra("serverAddress", address);
-                        intentToMainService.putExtra("serverName", name);
-                        sendBroadcast(intentToMainService);
+                        PCName = array[i].replaceAll("name: ", "");
+                        Log.d(LOG_TAG, "name: " + PCName);
+                    } else if (array[i].contains("distr")) {
+                        distr = array[i].replaceAll("distr: ", "");
+                        Log.d(LOG_TAG, "distr: " + distr);
                     }
+
                 }
+                if ((address != null) && (PCName != null) && (distr != null)) {
+                    sendIntentToActivity(address, PCName, distr);
+                }
+                socketBroadcast.close();
+                receiveBroadcast();
             }
         } catch (SocketException e) {
             Log.d(LOG_TAG, "socketBroadcast error: " + e);
@@ -66,7 +73,15 @@ public class ServerSearchService extends IntentService {
             socketBroadcast.close();
             receiveBroadcast();
         }
-        socketBroadcast.close();
-        receiveBroadcast();
+    }
+
+    void sendIntentToActivity(String address, String name, String distro) {
+        Log.d(LOG_TAG, "addr: " + address + " name: " + name + " distr: " + distro);
+        Intent intentToMainService = new Intent(actionToFragmentListServers);
+        intentToMainService.putExtra("parameters", "foundServer");
+        intentToMainService.putExtra("serverAddress", address);
+        intentToMainService.putExtra("serverName", name);
+        intentToMainService.putExtra("distr", distro);
+        sendBroadcast(intentToMainService);
     }
 }

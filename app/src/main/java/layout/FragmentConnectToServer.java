@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.dev.toxa.integrate.R;
@@ -27,10 +28,16 @@ public class FragmentConnectToServer extends Fragment {
     String parameters = "parameters";
 
     ImageView imageView_battery;
+    ImageView imageView_distr;
+
+    RelativeLayout layout_root;
+
     TextView batteryStatus;
     TextView networkStatus;
     TextView text_backlight;
     TextView text_sound;
+    TextView text_serverName;
+
     SeekBar seekBar_backlight;
     SeekBar seekBar_sound;
 
@@ -53,7 +60,10 @@ public class FragmentConnectToServer extends Fragment {
         networkStatus = (TextView) rootView.findViewById(R.id.networkStatus);
         text_backlight = (TextView) rootView.findViewById(R.id.text_backlight);
         text_sound = (TextView) rootView.findViewById(R.id.text_sound);
+        text_serverName = (TextView) rootView.findViewById(R.id.text_serverName);
         imageView_battery = (ImageView) rootView.findViewById(R.id.imageView_battery);
+        imageView_distr = (ImageView) rootView.findViewById(R.id.imageView_distr);
+        layout_root = (RelativeLayout) rootView.findViewById(R.id.layout_root);
         seekBar_backlight = (SeekBar) rootView.findViewById(R.id.seekBar_backlight);
         seekBar_sound = (SeekBar) rootView.findViewById(R.id.seekBar_sound);
 
@@ -195,6 +205,14 @@ public class FragmentConnectToServer extends Fragment {
                     }
                     Log.d(LOG_TAG, "Broadcast in FragmentConnectToServer");
                     updateData(jsonData);
+                } else if (params.contains("distr")) {
+                    String distro = intent.getStringExtra("distro");
+                    String PCName = intent.getStringExtra("PCName");
+                    if (distro.contains("Debian")) {
+                        imageView_distr.setImageResource(R.drawable.debian);
+//                        layout_root.setBackgroundResource(R.drawable.debian);
+                        text_serverName.setText(PCName);
+                    }
                 }
             } catch (NullPointerException e) {
                 Log.e(LOG_TAG, "null error: " + e);
