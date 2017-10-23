@@ -1,14 +1,17 @@
-package com.dev.toxa.integrate;
+package com.dev.toxa.integrate.Services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
+import com.dev.toxa.integrate.LoggingNameClass;
 
 import java.io.IOException;
 import java.net.*;
 
 public class ServerSearchService extends IntentService {
-    String LOG_TAG = "ServerSearchService: ";
+
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
+
     String actionToFragmentListServers = "com.dev.toxa.integrate.FragmentListServers";
 
     public ServerSearchService() {
@@ -53,7 +56,7 @@ public class ServerSearchService extends IntentService {
 
                 }
                 if ((address != null) && (PCName != null) && (distr != null)) {
-                    sendIntentToActivity(address, PCName, distr);
+//                    callbackToFragmentListServers.serverFound(address, PCName, distr);
                 }
                 socketBroadcast.close();
                 receiveBroadcast();
@@ -77,11 +80,13 @@ public class ServerSearchService extends IntentService {
 
     void sendIntentToActivity(String address, String name, String distro) {
         Log.d(LOG_TAG, "addr: " + address + " name: " + name + " distr: " + distro);
-        Intent intentToMainService = new Intent(actionToFragmentListServers);
-        intentToMainService.putExtra("parameters", "foundServer");
-        intentToMainService.putExtra("serverAddress", address);
-        intentToMainService.putExtra("serverName", name);
-        intentToMainService.putExtra("distr", distro);
-        sendBroadcast(intentToMainService);
+
+//        Intent intentToMainService = new Intent(actionToFragmentListServers);
+//        intentToMainService.putExtra("parameters", "foundServer");
+//        intentToMainService.putExtra("serverAddress", address);
+//        intentToMainService.putExtra("serverName", name);
+//        intentToMainService.putExtra("distr", distro);
+//        sendBroadcast(intentToMainService);
     }
+
 }

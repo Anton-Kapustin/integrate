@@ -1,4 +1,4 @@
-package com.dev.toxa.integrate;
+package com.dev.toxa.integrate.Services;
 
 import android.app.Notification;
 import android.content.Context;
@@ -7,10 +7,12 @@ import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
+import com.dev.toxa.integrate.LoggingNameClass;
 
 public class NotifyListenerService extends NotificationListenerService {
 
-    String LOG_TAG = " NotifylistenService: ";
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
+
     Context context;
     String actionToCommnandService = "com.dev.toxa.integrate.CommnadService";
     public NotifyListenerService() {

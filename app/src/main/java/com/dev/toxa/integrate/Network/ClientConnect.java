@@ -1,13 +1,17 @@
-package com.dev.toxa.integrate;
+package com.dev.toxa.integrate.Network;
 
 import android.util.Log;
+import com.dev.toxa.integrate.LoggingNameClass;
+
 import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 
 
 public class ClientConnect {
-    final String LOG_TAG = "ClientConnect";
+
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
+
     private Socket clientSocket = new Socket();
     private InetAddress ip;
     int port;

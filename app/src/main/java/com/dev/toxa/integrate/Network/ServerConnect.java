@@ -1,6 +1,7 @@
-package com.dev.toxa.integrate;
+package com.dev.toxa.integrate.Network;
 
 import android.util.Log;
+import com.dev.toxa.integrate.LoggingNameClass;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerConnect {
-    String LOG_TAG = "ServerConnect";
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
+
     private int port;
     private ServerSocket serverSocket = null;
     private Socket socket = null;

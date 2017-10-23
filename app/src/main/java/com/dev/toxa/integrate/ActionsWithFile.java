@@ -14,7 +14,9 @@ import static android.os.Environment.getExternalStorageState;
  * Created by toxa on 12.07.17.
  */
 public class ActionsWithFile {
-    String LOG_TAG = "ActionsWithFiles";
+
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
+
     String batteryFilename = "battery.txt";
     String statusFilename = "network.txt";
     String networkFilename = "status.txt";

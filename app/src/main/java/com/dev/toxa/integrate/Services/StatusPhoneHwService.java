@@ -1,17 +1,20 @@
-package com.dev.toxa.integrate;
+package com.dev.toxa.integrate.Services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
+import com.dev.toxa.integrate.ActionsWithFile;
+import com.dev.toxa.integrate.LoggingNameClass;
+import com.dev.toxa.integrate.Network.ServerConnect;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Map;
 
 public class StatusPhoneHwService extends IntentService {
-    final String LOG_TAG = "statusPhoneHwService";
+
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
 
     String actionToFragmentConnectToServer = "com.dev.toxa.integrate.FragmentConnectToServer";
     String actionToCommnadService = "com.dev.toxa.integrate.CommnadService";

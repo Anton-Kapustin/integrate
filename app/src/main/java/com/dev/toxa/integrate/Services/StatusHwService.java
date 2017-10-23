@@ -1,18 +1,23 @@
-package com.dev.toxa.integrate;
+package com.dev.toxa.integrate.Services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import com.dev.toxa.integrate.ActionsWithFile;
+import com.dev.toxa.integrate.LoggingNameClass;
+import com.dev.toxa.integrate.Network.ClientConnect;
+
 import java.io.IOException;
-import java.lang.reflect.Array;
 
 public class StatusHwService extends IntentService{
-    final String LOG_TAG = "statusHwService";
+
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
+
     final int port = 18030;
 
-    String actionToMainService = "com.dev.toxa.integrate.MainService";
+    String actionToMainService = "com.dev.toxa.integrate.Services.MainService";
 
     Intent intentToMainService = new Intent(actionToMainService);
 

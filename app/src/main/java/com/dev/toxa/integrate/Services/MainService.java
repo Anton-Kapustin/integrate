@@ -1,4 +1,4 @@
-package com.dev.toxa.integrate;
+package com.dev.toxa.integrate.Services;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -6,16 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
-import android.service.notification.NotificationListenerService;
 import android.util.Log;
+import com.dev.toxa.integrate.CommandService;
+import com.dev.toxa.integrate.LoggingNameClass;
 
 public class MainService extends Service {
 
-    String LOG_TAG = "MainService";
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
 
     serviceBroadcastReceiver receiver;
 
-    String actionToMainService = "com.dev.toxa.integrate.MainService";
+    String actionToMainService = "com.dev.toxa.integrate.Services.MainService";
     String IP = null;
     String parameters = "parameters";
 

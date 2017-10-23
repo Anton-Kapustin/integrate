@@ -1,4 +1,4 @@
-package com.dev.toxa.integrate;
+package com.dev.toxa.integrate.MainActivity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

@@ -12,8 +12,10 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class CommandService extends Service {
-    String LOG_TAG = "commandService";
-    String actionToMainService = "com.dev.toxa.integrate.MainService";
+
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
+
+    String actionToMainService = "com.dev.toxa.integrate.Services.MainService";
     String actionReceive = "com.dev.toxa.integrate.CommnadService";
 
     String actionBatteryChanged = Intent.ACTION_BATTERY_CHANGED;
@@ -97,7 +99,8 @@ public class CommandService extends Service {
     }
 
     public class CommandBroadcastReceiver extends BroadcastReceiver {
-        String parameters = "parameters";
+
+        private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
 
         @Override
         public void onReceive(Context context, Intent intent) {
