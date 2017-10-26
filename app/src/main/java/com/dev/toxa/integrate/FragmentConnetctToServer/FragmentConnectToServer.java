@@ -1,12 +1,9 @@
 package com.dev.toxa.integrate.FragmentConnetctToServer;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.*;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -21,10 +18,9 @@ import android.widget.TextView;
 import com.dev.toxa.integrate.LoggingNameClass;
 import com.dev.toxa.integrate.MainActivity.MainActivity;
 import com.dev.toxa.integrate.R;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import static android.content.Context.BATTERY_SERVICE;
+import static android.content.Context.BIND_AUTO_CREATE;
 
 
 public class FragmentConnectToServer extends Fragment implements MVPfragmentConnectToServer.view {
@@ -53,6 +49,10 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
 
     IntentFilter ifilter;
     Intent batteryState;
+
+    Intent intentServiceNotify;
+    ServiceConnection serviceConnectionNotify;
+    ServiceNotifyListener serviceNotifyListener;
     //==================================================================================================================
 
     @Override
@@ -62,10 +62,25 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
         activity = (MainActivity) getActivity();
         presenter = activity.setFragmentConnectToServer(this);
         context = getContext();
+        intentServiceNotify = new Intent(context, ServiceNotifyListener.class);
+        serviceConnectionNotify = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                Log.d(LOG_TAG, "Подключено к Notify Service");
+                serviceNotifyListener = ((ServiceNotifyListener.NotifyServiceBinder) iBinder).getService();
+                serviceNotifyListener.setPresenter(presenter);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+                Log.d(LOG_TAG, "Отключен от Notify Service");
+            }
+        };
     }
 
     @Override
     public void onPause() {
+        presenter.fragmentPause();
         super.onPause();
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
     }
@@ -73,11 +88,13 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     @Override
     public void onResume() {
         super.onResume();
+        presenter.fragmentResume();
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
     }
 
     @Override
     public void onDestroy() {
+        presenter.fragmentDestroy();
         super.onDestroy();
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
     }
@@ -164,7 +181,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
                 Log.d(LOG_TAG, "Статус зарядки: " + isCharging);
             }
         });
-
+        Log.d(LOG_TAG, "state[0]: " + state[0]);
         return state[0];
     }
 
@@ -179,13 +196,32 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     }
 
     @Override
-    public void startNotifyServie() {
-
+    public void startNotifyService() {
+        context.startService(intentServiceNotify);
     }
 
     @Override
     public void stopNotifyServie() {
+        context.stopService(intentServiceNotify);
+    }
 
+    @Override
+    public boolean getNotifyServiceState() {
+        if (serviceNotifyListener != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void bindNotifyService() {
+        context.bindService(intentServiceNotify, serviceConnectionNotify, BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void unbindNotifyService() {
+        context.unbindService(serviceConnectionNotify);
     }
 
     @Override

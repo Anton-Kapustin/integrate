@@ -1,12 +1,10 @@
-package com.dev.toxa.integrate.Services;
+package com.dev.toxa.integrate.FragmentListServers;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import com.dev.toxa.integrate.FragmentListServers.FragmentListServers;
 import com.dev.toxa.integrate.LoggingNameClass;
 
 import java.io.IOException;
@@ -18,15 +16,12 @@ public class ServiceFindServers extends Service {
 
     private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
 
-    Callback activity;
+    Callback presenter;
     boolean connection = false;
 
     Timer timer = new Timer();
 
     public ServiceFindBinder binder = new ServiceFindBinder();
-
-    public ServiceFindServers() {
-    }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
 //        searchingServers();
@@ -45,7 +40,7 @@ public class ServiceFindServers extends Service {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                if (activity != null) {
+                if (presenter != null) {
                     thread.start();
                 }
             }
@@ -54,12 +49,12 @@ public class ServiceFindServers extends Service {
 
     }
 
-    public void setActivity (FragmentListServers activity) {
-        this.activity = (Callback) activity;
-        if (activity != null) {
-            Log.d(LOG_TAG, "activity not null");
+    public void setPresenter(PresenterFragmentListServers presenter) {
+        this.presenter = presenter;
+        if (this.presenter != null) {
+            Log.d(LOG_TAG, "presenter not null");
         } else {
-            Log.d(LOG_TAG, "activity null");
+            Log.d(LOG_TAG, "presenter null");
         }
     }
 
@@ -96,8 +91,8 @@ public class ServiceFindServers extends Service {
                 }
                 socketBroadcast.close();
                 if ((address != null) && (PCName != null) && (distr != null)) {
-                    if (activity != null) {
-                        activity.foundServer(address, PCName, distr);
+                    if (presenter != null) {
+                        presenter.foundServer(address, PCName, distr);
                         socketBroadcast.close();
                     } else {
                         Log.d(LOG_TAG, "Activity null");

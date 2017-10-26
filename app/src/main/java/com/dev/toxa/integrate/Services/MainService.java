@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 import com.dev.toxa.integrate.CommandService;
+import com.dev.toxa.integrate.FragmentConnetctToServer.ServiceNotifyListener;
 import com.dev.toxa.integrate.LoggingNameClass;
 
 public class MainService extends Service {
@@ -44,7 +45,7 @@ public class MainService extends Service {
         statusHwService = new Intent(MainService.this, StatusHwService.class);
         statusPhoneHwService = new Intent(MainService.this, StatusPhoneHwService.class);
         commandService = new Intent(MainService.this, CommandService.class);
-        notifyListenerService = new Intent(MainService.this, NotifyListenerService.class);
+        notifyListenerService = new Intent(MainService.this, ServiceNotifyListener.class);
         registerReceiver(receiver, new IntentFilter(actionToMainService));
         serverSearchService = new Intent(MainService.this, ServerSearchService.class);
         startService(serverSearchService);

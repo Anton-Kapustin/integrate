@@ -4,7 +4,7 @@ import android.util.Log;
 import com.dev.toxa.integrate.LoggingNameClass;
 
 
-public class PresenterFragmentListServers implements MVPfragmentListServers.presenter {
+public class PresenterFragmentListServers implements MVPfragmentListServers.presenter, ServiceFindServers.Callback {
 
     private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
 
@@ -39,11 +39,7 @@ public class PresenterFragmentListServers implements MVPfragmentListServers.pres
 
     @Override
     public void fragmentLoaded() {
-        if (view != null) {
-            view.bindSearchService();
-        } else {
-            Log.d(LOG_TAG, "view null");
-        }
+
     }
 
     @Override
@@ -70,5 +66,16 @@ public class PresenterFragmentListServers implements MVPfragmentListServers.pres
     @Override
     public void onResume() {
         view.bindSearchService();
+    }
+
+    @Override
+    public void foundServer(final String IP, final String serverName, final String distro) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        int ID = model.addServer(IP, serverName, distro);
+        if (ID != 0) {
+            view.displayFoundServer(IP, ID, serverName, distro);
+        } else {
+            Log.d(LOG_TAG, "null ID");
+        }
     }
 }

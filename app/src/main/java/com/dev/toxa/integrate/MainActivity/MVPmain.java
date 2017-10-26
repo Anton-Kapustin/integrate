@@ -16,7 +16,7 @@ public interface MVPmain {
         PresenterFragmentListServers setFragmentListServers(MVPfragmentListServers.view view);
         PresenterFragmentSettings setFragmentSettings(MVPFragmentSettings.view view);
         void minimazeActivity();
-        void getShareLink();
+        boolean checkPermissions();
     }
 
     interface presenter {

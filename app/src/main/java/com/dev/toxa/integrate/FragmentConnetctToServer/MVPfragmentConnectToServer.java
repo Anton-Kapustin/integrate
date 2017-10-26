@@ -8,8 +8,11 @@ public interface MVPfragmentConnectToServer {
     interface view {
         String getBatteryState();
         String getNetworkState();
-        void startNotifyServie();
+        void startNotifyService();
+        void bindNotifyService();
+        void unbindNotifyService();
         void stopNotifyServie();
+        boolean getNotifyServiceState();
         void updateUiBattery(String value, String res);
         void updateUiNetwork(String network);
         void updateUiBacklight(int value);
@@ -22,6 +25,8 @@ public interface MVPfragmentConnectToServer {
         void setView (MVPfragmentConnectToServer.view view);
         void seekbarBacklightChanged(int value);
         void seekbarSoundChanged(int value);
-        void sendLink(String data);
+        void fragmentPause();
+        void fragmentResume();
+        void fragmentDestroy();
     }
 }

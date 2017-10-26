@@ -1,5 +1,6 @@
 package com.dev.toxa.integrate.MainActivity;
 
+import android.os.AsyncTask;
 import android.util.Log;
 import com.dev.toxa.integrate.LoggingNameClass;
 
@@ -19,7 +20,7 @@ public class PresenterMain implements MVPmain.presenter{
 
     @Override
     public void activityLoaded() {
-
+        view.checkPermissions();
     }
 
     @Override
@@ -28,7 +29,7 @@ public class PresenterMain implements MVPmain.presenter{
         if (actionSend.equals(actionReceive) && typeReceive != null) {
             if ("text/plain".equals(typeReceive)) {
                 Log.d(LOG_TAG, "SHARING TEXT");
-                view.getShareLink();
+//                view.getShareLink();
 //                view.minimazeActivity();
                 Log.d(LOG_TAG, "Закртытие активности");
             } else if (typeReceive.startsWith("image/")) {

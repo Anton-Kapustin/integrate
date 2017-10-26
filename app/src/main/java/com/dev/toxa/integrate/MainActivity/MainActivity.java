@@ -1,17 +1,26 @@
 package com.dev.toxa.integrate.MainActivity;
 
+import android.Manifest;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import com.dev.toxa.integrate.FragmentConnetctToServer.MVPfragmentConnectToServer;
 import com.dev.toxa.integrate.FragmentConnetctToServer.PresenterFragmentConnectToServer;
+import com.dev.toxa.integrate.FragmentConnetctToServer.ServiceNotifyListener;
 import com.dev.toxa.integrate.FragmentListServers.MVPfragmentListServers;
 import com.dev.toxa.integrate.FragmentListServers.PresenterFragmentListServers;
+import com.dev.toxa.integrate.FragmentListServers.ServiceFindServers;
 import com.dev.toxa.integrate.FragmentSettings.MVPFragmentSettings;
 import com.dev.toxa.integrate.FragmentSettings.PresenterFragmentSettings;
 import com.dev.toxa.integrate.LoggingNameClass;
@@ -35,9 +44,10 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     PresenterFragmentListServers presenterFragmentListServers;
     PresenterFragmentConnectToServer presenterFragmentConnectToServer;
     PresenterFragmentSettings presenterFragmentSettings;
-    ActivitySharing activitySharing;
 
     Intent intentShare;
+
+    private static final int MY_PERMISSION_ACCESS_COURSE_NOTIFICATION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
 
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         tabLayout.setupWithViewPager(viewPager);
+        presenterMain.activityLoaded();
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -71,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         return this;
     }
 
-    //====================Создание презертеров фрагментов, прикрепление view к презентерам=========================
+    //====================Создание презертеров фрагментов, прикрепление view к презентерам==============================
+
     @Override
     public PresenterFragmentListServers setFragmentListServers(MVPfragmentListServers.view view) {
         Log.i(LOG_TAG, "method name: " + Thread.currentThread().getStackTrace()[2].getMethodName());
@@ -108,9 +120,9 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         return presenterFragmentConnectToServer;
     }
 
-    //=============================Отправка IP и servername во fragmentConnectToServer==========+++===============
+    //=============================Отправка IP и servername во fragmentConnectToServer==========+++=====================
     @Override
-    public void connectToSetver(final String IP, final String serverName, final String distr) {
+    public void connectToServer(final String IP, final String serverName, final String distr) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         Log.d(LOG_TAG, "IP для соединения с сервером: " + IP + " " + serverName);
         runOnUiThread(new Runnable() {
@@ -120,6 +132,51 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
             }
         });
     }
+
+    //=============================================Проверка разрешений==================================================
+
+    @Override
+    public boolean checkPermissions() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        if ( ContextCompat.checkSelfPermission(this, Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE ) != PackageManager.PERMISSION_GRANTED ) {
+            Log.d(LOG_TAG, "Еще нет доступа к уведомлениям");
+            Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+            startActivityForResult(intent, 0);
+        }
+        return false;
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        Log.d(LOG_TAG, "Grant result: " + grantResults[0]);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSION_ACCESS_COURSE_NOTIFICATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(LOG_TAG, "Разрешение дано");
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+                    Log.d(LOG_TAG, "В доступе отказано");
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+    //==================================================================================================================
+
+    //=============================================Жизненный цикл=======================================================
 
     @Override
     public void onResume(){
@@ -138,25 +195,33 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     }
 
     @Override
+    public void onPause() {
+
+    }
+
+    @Override
+    public void onDestroy() {
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.put
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+    //==================================================================================================================
+
+    @Override
     public void minimazeActivity() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         moveTaskToBack(true);
     }
 
-    @Override
-    public void getShareLink() {
-        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        final String sharedText = intentShare.getStringExtra(Intent.EXTRA_TEXT);
-        if (presenterFragmentConnectToServer != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    presenterFragmentConnectToServer.sendLink(sharedText);
-                }
-            });
-        } else {
-            Log.d(LOG_TAG, "fragment connect to server null");
-        }
-    }
-    //=============================================================================================================
+    //==================================================================================================================
 }
