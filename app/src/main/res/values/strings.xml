@@ -8,10 +8,9 @@
     <string name="lable_backlight">Backlight</string>
     <string name="available_devices">Available devices</string>
     <string name="title_activity_connection">ActivityConnection</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Settings">Settings Page</string>
     <string name="title_activity_sharing">ActivitySharing</string>
     <string name="text_serverName">PC Name</string>
+    <string name="text_cb_notify_enable">Доступ к уведомлениям</string>
 </resources>

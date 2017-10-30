@@ -4,9 +4,22 @@
              android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
              tools:context="com.dev.toxa.integrate.FragmentSettings.FragmentSettings">
 
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" tools:ignore="UselessParent">
+
     <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:text="@string/Settings" android:id="@+id/text_settings"/>
+        <CheckBox
+                android:text="@string/text_cb_notify_enable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/settings_cb_notify_enable"
+        />
+
+    </LinearLayout>
 
 </FrameLayout>

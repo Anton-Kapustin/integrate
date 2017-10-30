@@ -1,17 +1,15 @@
 package com.dev.toxa.integrate.FragmentConnetctToServer;
 
 
-import org.json.JSONObject;
-
 public interface MVPfragmentConnectToServer {
 
     interface view {
         String getBatteryState();
         String getNetworkState();
         void startNotifyService();
+        void stopNotifyService();
         void bindNotifyService();
         void unbindNotifyService();
-        void stopNotifyServie();
         boolean getNotifyServiceState();
         void updateUiBattery(String value, String res);
         void updateUiNetwork(String network);

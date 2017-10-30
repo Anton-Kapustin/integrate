@@ -58,6 +58,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setRetainInstance(true);
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         activity = (MainActivity) getActivity();
         presenter = activity.setFragmentConnectToServer(this);
@@ -76,27 +77,6 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
                 Log.d(LOG_TAG, "Отключен от Notify Service");
             }
         };
-    }
-
-    @Override
-    public void onPause() {
-        presenter.fragmentPause();
-        super.onPause();
-        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        presenter.fragmentResume();
-        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-    }
-
-    @Override
-    public void onDestroy() {
-        presenter.fragmentDestroy();
-        super.onDestroy();
-        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
     }
 
     @Override
@@ -160,6 +140,54 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
         return rootView;
     }
 
+    //===========================================Жизненный цикл=========================================================
+
+    @Override
+    public void onPause() {
+        presenter.fragmentPause();
+        super.onPause();
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.fragmentResume();
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+
+        savedInstanceState.putString("batteryStatus", (String) batteryStatus.getText());
+        savedInstanceState.putString("networkStatus", (String) networkStatus.getText());
+        savedInstanceState.putString("text_backlight", (String) text_backlight.getText());
+        savedInstanceState.putString("text_sound", (String) text_sound.getText());
+        savedInstanceState.putString("text_serverName", (String) text_serverName.getText());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+
+        if (savedInstanceState != null) {
+            batteryStatus.setText(savedInstanceState.getString("batteryStatus"));
+            networkStatus.setText(savedInstanceState.getString("networkStatus"));
+            text_backlight.setText(savedInstanceState.getString("text_backlight"));
+            text_sound.setText(savedInstanceState.getString("text_sound"));
+            text_serverName.setText(savedInstanceState.getString("text_serverName"));
+        }
+    }
+    //===========================================Показания датчиков=====================================================
+
     @Override
     public String getBatteryState() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
@@ -195,13 +223,25 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
         return networkStatus;
     }
 
+    //===========================================Запуск сервиса=========================================================
+
+    @Override
+    public void bindNotifyService() {
+        context.bindService(intentServiceNotify, serviceConnectionNotify, BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void unbindNotifyService() {
+        context.unbindService(serviceConnectionNotify);
+    }
+
     @Override
     public void startNotifyService() {
         context.startService(intentServiceNotify);
     }
 
     @Override
-    public void stopNotifyServie() {
+    public void stopNotifyService() {
         context.stopService(intentServiceNotify);
     }
 
@@ -214,15 +254,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
         }
     }
 
-    @Override
-    public void bindNotifyService() {
-        context.bindService(intentServiceNotify, serviceConnectionNotify, BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void unbindNotifyService() {
-        context.unbindService(serviceConnectionNotify);
-    }
+    //==========================================Обновление интерфейса===================================================
 
     @Override
     public void updateUiBattery(final String value, final String res) {
@@ -291,6 +323,6 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
             }
         });
     }
-
+    //==================================================================================================================
 }
 

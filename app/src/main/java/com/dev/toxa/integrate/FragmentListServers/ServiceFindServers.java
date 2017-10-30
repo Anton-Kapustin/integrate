@@ -30,22 +30,25 @@ public class ServiceFindServers extends Service {
 
     public void searchingServers() {
 
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                receiveBroadcast();
-            }
-        });
+
 
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
+                Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+
                 if (presenter != null) {
+                    final Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            receiveBroadcast();
+                        }
+                    });
                     thread.start();
                 }
             }
         };
-        timer.schedule(timerTask, 3000, 6000);
+        timer.schedule(timerTask, 3000, 7000);
 
     }
 
@@ -59,6 +62,8 @@ public class ServiceFindServers extends Service {
     }
 
     void receiveBroadcast() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+
         connection = true;
         DatagramSocket socketBroadcast = null;
         try {
@@ -69,7 +74,7 @@ public class ServiceFindServers extends Service {
             byte[] buffer = new byte[256];
             DatagramPacket udpPacket = new DatagramPacket(buffer, buffer.length);
             Log.d(LOG_TAG, "Создан пакет udp");
-            socketBroadcast.setSoTimeout(5000);
+            socketBroadcast.setSoTimeout(2000);
             socketBroadcast.receive(udpPacket);
             Log.d(LOG_TAG, "Получен пакет udp");
             String broadcastMessage = new String(buffer, 0, udpPacket.getLength());
@@ -111,6 +116,7 @@ public class ServiceFindServers extends Service {
             e.printStackTrace();
         }
         socketBroadcast.close();
+        Log.d(LOG_TAG, "broadcastReceiver close");
     }
 
 
@@ -124,6 +130,7 @@ public class ServiceFindServers extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        timer.cancel();
     }
 
     public boolean getConnection() {

@@ -1,8 +1,8 @@
 package com.dev.toxa.integrate.MainActivity;
 
-import android.os.AsyncTask;
 import android.util.Log;
 import com.dev.toxa.integrate.LoggingNameClass;
+import com.dev.toxa.integrate.db.DbHelper;
 
 public class PresenterMain implements MVPmain.presenter{
 
@@ -20,7 +20,7 @@ public class PresenterMain implements MVPmain.presenter{
 
     @Override
     public void activityLoaded() {
-        view.checkPermissions();
+        DbHelper dbHelper = new DbHelper(view.getContext(), 1);
     }
 
     @Override

@@ -20,7 +20,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
             <intent-filter android:label="Send to PC">
                 <action android:name="android.intent.action.SEND"/>
 
@@ -42,7 +41,6 @@
 
                 <data android:mimeType="image/*"/>
             </intent-filter>
-
         </activity>
 
         <service
@@ -71,9 +69,7 @@
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService"/>
             </intent-filter>
-
         </service>
-
         <service
                 android:name=".Services.ServerSearchService"
                 android:exported="false">
@@ -83,17 +79,17 @@
                 android:name=".ActivitySharing.ActivitySharing"
                 android:label="@string/title_activity_sharing"
                 android:theme="@style/AppTheme">
-
         </activity>
 
         <service
                 android:name=".FragmentListServers.ServiceFindServers"
                 android:enabled="true"
                 android:exported="true">
-                <intent-filter>
-                    <action android:name=".Services.ServiceFindServers.BIND" />
-                    <category android:name="android.intent.category.DEFAULT"/>
-                </intent-filter>
+            <intent-filter>
+                <action android:name=".Services.ServiceFindServers.BIND"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </service>
     </application>
 

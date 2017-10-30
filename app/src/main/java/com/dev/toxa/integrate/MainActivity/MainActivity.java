@@ -100,11 +100,10 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     @Override
     public PresenterFragmentSettings setFragmentSettings(MVPFragmentSettings.view view) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        MVPFragmentSettings.view fragmentSettings = (MVPFragmentSettings.view) getSupportFragmentManager().findFragmentByTag(viewPager.getId() + ":" + adapter.getItem(2));
         if (presenterFragmentSettings != null) {
-            presenterFragmentSettings.setView(fragmentSettings);
+            presenterFragmentSettings.setView(view);
         } else {
-            presenterFragmentSettings = new PresenterFragmentSettings(fragmentSettings);
+            presenterFragmentSettings = new PresenterFragmentSettings(view);
         }
         return presenterFragmentSettings;
     }
@@ -135,13 +134,15 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
 
     //=============================================Проверка разрешений==================================================
 
+
+
     @Override
     public boolean checkPermissions() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+
         if ( ContextCompat.checkSelfPermission(this, Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE ) != PackageManager.PERMISSION_GRANTED ) {
             Log.d(LOG_TAG, "Еще нет доступа к уведомлениям");
-            Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-            startActivityForResult(intent, 0);
+
         }
         return false;
 
@@ -151,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+
         Log.d(LOG_TAG, "Grant result: " + grantResults[0]);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
@@ -174,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
             // permissions this app might request
         }
     }
-    //==================================================================================================================
 
     //=============================================Жизненный цикл=======================================================
 
@@ -182,33 +183,33 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     public void onResume(){
         super.onResume();
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        if (presenterFragmentConnectToServer != null) {
-            String actionSend = Intent.ACTION_SEND;
-            String actionMultiple = Intent.ACTION_SEND_MULTIPLE;
-            intentShare = getIntent();
-            String action = intentShare.getAction();
-            String type = intentShare.getType();
-            presenterMain.OnResume(actionSend, actionMultiple, action, type);
-        } else {
-            Log.d(LOG_TAG, "presenter connect null");
-        }
+//        if (presenterFragmentConnectToServer != null) {
+//            String actionSend = Intent.ACTION_SEND;
+//            String actionMultiple = Intent.ACTION_SEND_MULTIPLE;
+//            intentShare = getIntent();
+//            String action = intentShare.getAction();
+//            String type = intentShare.getType();
+//            presenterMain.OnResume(actionSend, actionMultiple, action, type);
+//        } else {
+//            Log.d(LOG_TAG, "presenter connect null");
+//        }
     }
 
     @Override
     public void onPause() {
-
+        super.onPause();
     }
 
     @Override
     public void onDestroy() {
-
+        super.onDestroy();
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.put
+
     }
 
     @Override
@@ -222,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         moveTaskToBack(true);
     }
+
 
     //==================================================================================================================
 }
