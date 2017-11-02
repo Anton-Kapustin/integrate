@@ -1,9 +1,13 @@
 package com.dev.toxa.integrate.FragmentConnetctToServer;
 
 
+import android.content.Context;
+
 public interface MVPfragmentConnectToServer {
 
     interface view {
+        Context getFragmentcontext();
+        void setCheckbox(boolean enabled);
         String getBatteryState();
         String getNetworkState();
         void startNotifyService();
@@ -21,6 +25,7 @@ public interface MVPfragmentConnectToServer {
 
     interface presenter {
         void setView (MVPfragmentConnectToServer.view view);
+        void checkboxChecked(boolean enabled);
         void seekbarBacklightChanged(int value);
         void seekbarSoundChanged(int value);
         void fragmentPause();

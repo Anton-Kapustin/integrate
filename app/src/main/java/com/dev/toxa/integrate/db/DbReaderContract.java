@@ -10,9 +10,10 @@ public class DbReaderContract {
         public static final String TABLE_NAME = "DATA";
         public static final String SERVER_NAME = "SERVER_NAME";
         public static final String IP_ADDRESS = "IP";
+        public static final String MAC_ADDRESS = "MAC";
         public static final String DISTR_NAME = "DISTR";
         public static final String FAVORITE = "FAVORITE";
-        public static final String LAST_USE = "LAST_USE";
+        public static final String IN_USE = "IN_USE";
     }
 
     public static abstract class settingsEntry implements BaseColumns {

@@ -30,15 +30,16 @@ public class ConnectToServer {
             @Override
             public void run() {
                 Log.d(LOG_TAG, "IP: " + IP);
-                clientConnect = new ClientConnect();
-                clientConnect.connect(IP, port);
-                clientConnect.send(message);
-                presenterFragmentConnectToServer.startServer();
                 try {
+                    clientConnect = new ClientConnect();
+                    clientConnect.connect(IP, port);
+                    clientConnect.send(message);
+                    presenterFragmentConnectToServer.startServer();
                     clientConnect.close();
                 } catch (IOException e) {
                     connectionCount ++;
-                    if (connectionCount == 3) {
+                    Log.d(LOG_TAG, "count: " + connectionCount);
+                    if (connectionCount == 4) {
                         presenterFragmentConnectToServer.stopServer();
                     }
                     e.printStackTrace();

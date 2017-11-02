@@ -83,9 +83,6 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
             }
         };
         context = this.getContext();
-
-
-
     }
 
     @Override
@@ -126,7 +123,12 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
     }
 
     @Override
-    public void displayFoundServer(final String IP, final int ID, final String serverName, final String distr) {
+    public Context getFragmentListContext() {
+        return getContext();
+    }
+
+    @Override
+    public void displayFoundServer(final String serverName, final int ID, final String IP, final String macAddress, final String distr) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -137,7 +139,7 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
                 final Button buttonSrv = new Button(context);
                 buttonSrv.setLayoutParams(params);
                 buttonSrv.setId(ID);
-                buttonSrv.setTag(IP + "," + distr);
+                buttonSrv.setTag(IP + "," + macAddress + "," + distr);
                 Log.d(LOG_TAG, "Текст кнопки " + serverName);
                 buttonSrv.setText(serverName);
                 layout_listServers.addView(buttonSrv);
@@ -173,13 +175,13 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
     }
 
     @Override
-    public void sendIPtoConnectFragment(final String IP, final String serverName, final String distr) {
+    public void sendServerIDToActivity(final int serverID) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         callbackToActivity = (CallbackToActivity) activity;
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                callbackToActivity.connectToServer(IP, serverName, distr);
+                callbackToActivity.sendServerIDToFragmentConnect(serverID);
             }
         });
     }
@@ -187,7 +189,7 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
 
 
     public interface CallbackToActivity {
-        void connectToServer(String IP, String serverName, String distr);
+        void sendServerIDToFragmentConnect(int serverID);
     }
 
 }

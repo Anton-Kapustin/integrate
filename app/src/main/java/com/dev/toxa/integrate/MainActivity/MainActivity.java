@@ -1,15 +1,11 @@
 package com.dev.toxa.integrate.MainActivity;
 
 import android.Manifest;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -17,10 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import com.dev.toxa.integrate.FragmentConnetctToServer.MVPfragmentConnectToServer;
 import com.dev.toxa.integrate.FragmentConnetctToServer.PresenterFragmentConnectToServer;
-import com.dev.toxa.integrate.FragmentConnetctToServer.ServiceNotifyListener;
 import com.dev.toxa.integrate.FragmentListServers.MVPfragmentListServers;
 import com.dev.toxa.integrate.FragmentListServers.PresenterFragmentListServers;
-import com.dev.toxa.integrate.FragmentListServers.ServiceFindServers;
 import com.dev.toxa.integrate.FragmentSettings.MVPFragmentSettings;
 import com.dev.toxa.integrate.FragmentSettings.PresenterFragmentSettings;
 import com.dev.toxa.integrate.LoggingNameClass;
@@ -28,7 +22,6 @@ import com.dev.toxa.integrate.R;
 import com.dev.toxa.integrate.FragmentConnetctToServer.FragmentConnectToServer;
 import com.dev.toxa.integrate.FragmentListServers.FragmentListServers;
 import com.dev.toxa.integrate.FragmentSettings.FragmentSettings;
-import com.dev.toxa.integrate.ActivitySharing.ActivitySharing;
 
 public class MainActivity extends AppCompatActivity implements MVPmain.view, FragmentListServers.CallbackToActivity {
 
@@ -121,13 +114,13 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
 
     //=============================Отправка IP и servername во fragmentConnectToServer==========+++=====================
     @Override
-    public void connectToServer(final String IP, final String serverName, final String distr) {
+    public void sendServerIDToFragmentConnect(final int serverID) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        Log.d(LOG_TAG, "IP для соединения с сервером: " + IP + " " + serverName);
+        Log.d(LOG_TAG, "ID сервера: " + serverID);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                presenterFragmentConnectToServer.connectToServer(IP, serverName, distr);
+                presenterFragmentConnectToServer.clickedOnFoundServer(serverID);
             }
         });
     }

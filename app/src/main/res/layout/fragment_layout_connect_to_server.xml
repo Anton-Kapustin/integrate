@@ -4,48 +4,67 @@
              android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
              tools:context="com.dev.toxa.integrate.FragmentConnetctToServer.FragmentConnectToServer">
 
-    <RelativeLayout
+    <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
-            android:padding="2dp" tools:ignore="UselessParent"
-            android:id="@+id/layout_root">
+            android:id="@+id/layout_root"
+            android:padding="10dp" tools:ignore="UselessParent">
 
-        <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/layout_serverName"
-                android:layout_gravity="center"
-                tools:ignore="RtlHardcoded,UseCompoundDrawables"
-                android:layout_marginBottom="5dp"
-                android:gravity="center">
-
-            <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    app:srcCompat="@drawable/ic_phonelink_off_black_24dp"
-                    android:id="@+id/imageView_distr"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitXY"
-                    tools:ignore="ContentDescription"/>
-            <TextView
-                    android:text="@string/text_serverName"
-                    android:layout_width="wrap_content"
+            <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:id="@+id/text_serverName"
-                    android:gravity="center"/>
-        </LinearLayout>
+                    android:layout_marginTop="0dp"
+                    android:padding="0dp" tools:ignore="UselessParent"
+                    android:id="@+id/layout_star">
+
+                <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/layout_serverName"
+                        android:layout_alignParentStart="false"
+                        android:layout_gravity="center_vertical"
+                        android:layout_alignParentLeft="false"
+                        tools:ignore="RelativeOverlap,RtlHardcoded,UseCompoundDrawables" android:layout_alignWithParentIfMissing="false"
+                        android:layout_centerHorizontal="false" android:gravity="left"
+                        android:layout_centerVertical="true" android:layout_centerInParent="true">
+
+                    <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            app:srcCompat="@drawable/ic_phonelink_off_black_24dp"
+                            android:id="@+id/imageView_distr"
+                            android:scaleType="fitXY"
+                            tools:ignore="ContentDescription"
+                            android:layout_gravity="center_vertical" android:layout_marginLeft="10dp"/>
+                    <TextView
+                            android:text="@string/text_serverName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:id="@+id/text_serverName"
+                            android:layout_gravity="center_vertical"/>
+                        </LinearLayout>
+
+                        <CheckBox
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" android:id="@+id/checkBox_favorite"
+                                style="@android:style/Widget.Material.Light.CompoundButton.Star"
+                                tools:ignore="RtlHardcoded,RtlSymmetry"
+                                android:gravity="right|center_vertical" android:elevation="0dp"
+                                android:layout_marginLeft="0dp"
+                                android:layout_alignParentTop="false" android:layout_alignParentEnd="false"
+                                android:layout_marginEnd="10dp" android:layout_alignParentRight="true"
+                                android:layout_centerVertical="false"/>
+            </RelativeLayout>
 
         <RelativeLayout
                 android:layout_height="wrap_content"
                 android:id="@+id/layout_Status"
                 android:background="@drawable/shadow_134848"
-                android:layout_alignParentStart="false"
                 android:gravity="center_vertical"
                 android:layout_width="wrap_content"
-                android:layout_below="@id/layout_serverName"
                 tools:ignore="ExtraText">>
             <LinearLayout
                     android:orientation="horizontal"
@@ -113,8 +132,6 @@
             android:background="@drawable/shadow_134848"
             android:padding="10dp"
             android:layout_marginTop="0dp"
-            android:layout_below="@id/layout_Status"
-            android:layout_alignParentStart="true"
             tools:ignore="UnknownId">
                 <ImageView
                         android:layout_width="match_parent"
@@ -139,8 +156,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/layout_sound"
             android:background="@drawable/shadow_134848"
-            android:layout_below="@+id/layout_backlight"
-            android:layout_alignParentStart="true"
             android:padding="10dp">
             <ImageView
                 android:layout_width="match_parent"
@@ -160,5 +175,5 @@
                     android:gravity="center"/>
 
         </LinearLayout>
-    </RelativeLayout>
+    </LinearLayout>
 </FrameLayout>

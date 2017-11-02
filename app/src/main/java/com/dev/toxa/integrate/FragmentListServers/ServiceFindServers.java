@@ -68,20 +68,20 @@ public class ServiceFindServers extends Service {
         DatagramSocket socketBroadcast = null;
         try {
             String PCName = null;
+            String macAddress = null;
             String distr = null;
             socketBroadcast = new DatagramSocket(18032);
             Log.d(LOG_TAG, "Создан сервер udp");
             byte[] buffer = new byte[256];
             DatagramPacket udpPacket = new DatagramPacket(buffer, buffer.length);
             Log.d(LOG_TAG, "Создан пакет udp");
-            socketBroadcast.setSoTimeout(2000);
+            socketBroadcast.setSoTimeout(5000);
             socketBroadcast.receive(udpPacket);
             Log.d(LOG_TAG, "Получен пакет udp");
             String broadcastMessage = new String(buffer, 0, udpPacket.getLength());
             if (broadcastMessage.contains("integrate")) {
                 InetAddress addr = udpPacket.getAddress();
                 String address = addr.getHostAddress();
-
                 Log.d(LOG_TAG, "Broadcast получен: " + broadcastMessage + " от: " + address);
                 String[] array = broadcastMessage.split(", ");
                 Log.d(LOG_TAG, array.toString());
@@ -89,6 +89,9 @@ public class ServiceFindServers extends Service {
                     if (array[i].contains("name")) {
                         PCName = array[i].replaceAll("name: ", "");
                         Log.d(LOG_TAG, "name: " + PCName);
+                    } else if (array[i].contains("mac")) {
+                        macAddress = array[i].replaceAll("mac: ", "").replaceAll("\\s+","");
+                        Log.d(LOG_TAG, "Mac address: " + macAddress);
                     } else if (array[i].contains("distr")) {
                         distr = array[i].replaceAll("distr: ", "");
                         Log.d(LOG_TAG, "distr: " + distr);
@@ -97,7 +100,7 @@ public class ServiceFindServers extends Service {
                 socketBroadcast.close();
                 if ((address != null) && (PCName != null) && (distr != null)) {
                     if (presenter != null) {
-                        presenter.foundServer(address, PCName, distr);
+                        presenter.foundServer(address, PCName, macAddress, distr);
                         socketBroadcast.close();
                     } else {
                         Log.d(LOG_TAG, "Activity null");
@@ -138,7 +141,7 @@ public class ServiceFindServers extends Service {
     }
 
     public interface Callback {
-        void foundServer(String IP, String serverName, String distro);
+        void foundServer(String IP, String serverName, String macAddress, String distro);
     }
 
     public class ServiceFindBinder extends Binder {

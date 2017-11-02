@@ -2,6 +2,7 @@ package com.dev.toxa.integrate.FragmentConnetctToServer;
 
 import android.util.Log;
 import com.dev.toxa.integrate.LoggingNameClass;
+import com.dev.toxa.integrate.db.DbHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,7 +10,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class PresenterFragmentConnectToServer implements MVPfragmentConnectToServer.presenter, ConnectToServer.CallbackToPresenter, ServiceNotifyListener.CallbackToPressenter {
+public class PresenterFragmentConnectToServer implements MVPfragmentConnectToServer.presenter,
+        ConnectToServer.CallbackToPresenter, ServiceNotifyListener.CallbackToPressenter {
 
     //===================================Переменные=====================================================================
     private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
@@ -21,12 +23,15 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
     private ConnectToServer connectToServer = new ConnectToServer(this);
     private ModelFragmentConnectToServer modelFragmentConnectToServer = new ModelFragmentConnectToServer();
     boolean statusConnection = false;
+    DbHelper dbHelper;
     Timer timer;
     //==================================================================================================================
 
     public PresenterFragmentConnectToServer (MVPfragmentConnectToServer.view view) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         this.view = view;
+        dbHelper = new DbHelper(view.getFragmentcontext(), 1);
+        modelFragmentConnectToServer.setDbHelper(dbHelper);
     }
 
     @Override
@@ -35,12 +40,17 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         this.view = view;
     }
 
-    public void connectToServer(String IP, String serverName, String distr) {
+    @Override
+    public void checkboxChecked(boolean enabled) {
+        modelFragmentConnectToServer.setFavorite(enabled);
+    }
+
+    public void clickedOnFoundServer(int serverID) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        modelFragmentConnectToServer.setCurrentIP(IP);
-        modelFragmentConnectToServer.setCurrentServerName(serverName);
-        modelFragmentConnectToServer.setCurrentDistr(distr);
-        connectToServer.sendMessage(IP, "info");
+        modelFragmentConnectToServer.getServerDataFromID(serverID);
+        view.setCheckbox(modelFragmentConnectToServer.getIsFavorite());
+        view.bindNotifyService();
+        connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), "info");
     }
 
     @Override
@@ -93,7 +103,6 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
             };
             timer.schedule(timerTask, 60000, 60000);
             connectToServer.runServer(modelFragmentConnectToServer.getCurrentIP());
-//            view.startNotifyService();
             view.bindNotifyService();
         }
     }
@@ -102,6 +111,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
     public void stopServer() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         connectToServer.setConnetionState(false);
+        modelFragmentConnectToServer.setInUse(false);
     }
 
     @Override

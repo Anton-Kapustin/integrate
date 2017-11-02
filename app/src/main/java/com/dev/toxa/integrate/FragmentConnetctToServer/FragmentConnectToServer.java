@@ -11,10 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
+import android.widget.*;
 import com.dev.toxa.integrate.LoggingNameClass;
 import com.dev.toxa.integrate.MainActivity.MainActivity;
 import com.dev.toxa.integrate.R;
@@ -33,7 +30,9 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     ImageView imageView_battery;
     ImageView imageView_distr;
 
-    RelativeLayout layout_root;
+    CheckBox checkBoxFavorite;
+
+    LinearLayout layout_root;
 
     TextView batteryStatus;
     TextView networkStatus;
@@ -58,7 +57,6 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setRetainInstance(true);
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         activity = (MainActivity) getActivity();
         presenter = activity.setFragmentConnectToServer(this);
@@ -90,7 +88,8 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
         text_serverName = (TextView) rootView.findViewById(R.id.text_serverName);
         imageView_battery = (ImageView) rootView.findViewById(R.id.imageView_battery);
         imageView_distr = (ImageView) rootView.findViewById(R.id.imageView_distr);
-        layout_root = (RelativeLayout) rootView.findViewById(R.id.layout_root);
+        layout_root = (LinearLayout) rootView.findViewById(R.id.layout_root);
+        checkBoxFavorite = (CheckBox) rootView.findViewById(R.id.checkBox_favorite);
         seekBar_backlight = (SeekBar) rootView.findViewById(R.id.seekBar_backlight);
         seekBar_sound = (SeekBar) rootView.findViewById(R.id.seekBar_sound);
 
@@ -133,11 +132,34 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
             }
         });
 
+        checkBoxFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                presenter.checkboxChecked(b);
+            }
+        });
+
         ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         batteryState = context.registerReceiver(null, ifilter);
 
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         return rootView;
+    }
+
+    @Override
+    public Context getFragmentcontext() {
+        return getContext();
+    }
+
+    @Override
+    public void setCheckbox(final boolean enabled) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                checkBoxFavorite.setChecked(enabled);
+            }
+        });
     }
 
     //===========================================Жизненный цикл=========================================================

@@ -2,7 +2,9 @@ package com.dev.toxa.integrate.FragmentListServers;
 
 import android.util.Log;
 import com.dev.toxa.integrate.LoggingNameClass;
+import com.dev.toxa.integrate.db.DbHelper;
 
+import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +15,9 @@ public class ModelFragmentListServers {
     private List<String> serversIP = new ArrayList();
     private String serverName = null;
     private String distro = null;
+    private DbHelper dbHelper;
 
-    int addServer(String IP, String serverName, String distro) {
+    public int addServer(String IP, String serverName, String macAddress, String distro) {
         if (serversIP != null) {
             if (serversIP.contains(IP)) {
                 return 0;
@@ -29,16 +32,18 @@ public class ModelFragmentListServers {
         return getID();
     }
 
-    int getID() {
+    public void setDbHelper(DbHelper dbHelper) {
+        this.dbHelper = dbHelper;
+    }
+
+    public int getID() {
         return serversIP.size();
     }
 
-    String getIP(int ID) {
-        return serversIP.get(ID - 1);
-    }
-
-    public String getDistro() {
-        return distro;
+    public int addToDB(String IP, String serverName, String macAddress, String distro) {
+        int ID = dbHelper.addToBaseServer(IP, serverName, macAddress, distro);
+        Log.d(LOG_TAG, "ID: " + ID);
+        return ID;
     }
 
     void clearData() {
