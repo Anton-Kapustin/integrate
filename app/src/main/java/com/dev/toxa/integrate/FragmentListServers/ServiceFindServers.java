@@ -21,7 +21,11 @@ public class ServiceFindServers extends Service {
 
     Timer timer = new Timer();
 
+    Thread thread = null;
+
     public ServiceFindBinder binder = new ServiceFindBinder();
+
+    //==================================================================================================================
 
     public int onStartCommand(Intent intent, int flags, int startId) {
 //        searchingServers();
@@ -36,9 +40,8 @@ public class ServiceFindServers extends Service {
             @Override
             public void run() {
                 Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-
                 if (presenter != null) {
-                    final Thread thread = new Thread(new Runnable() {
+                    thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
                             receiveBroadcast();
@@ -49,7 +52,6 @@ public class ServiceFindServers extends Service {
             }
         };
         timer.schedule(timerTask, 3000, 7000);
-
     }
 
     public void setPresenter(PresenterFragmentListServers presenter) {
@@ -132,8 +134,19 @@ public class ServiceFindServers extends Service {
 
     @Override
     public void onDestroy() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+//        timer.cancel();
+//        thread.interrupt();
+//        thread = null;
         super.onDestroy();
+    }
+
+    public void stopService() {
         timer.cancel();
+        if (thread != null) {
+            thread.interrupt();
+            thread = null;
+        }
     }
 
     public boolean getConnection() {

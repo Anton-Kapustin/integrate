@@ -50,6 +50,7 @@ public class PresenterFragmentListServers implements MVPfragmentListServers.pres
 
     @Override
     public void onDestroy() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         view.unBindSearchService();
         modelFragmentListServers.clearData();
 

@@ -15,6 +15,7 @@ public interface MVPfragmentConnectToServer {
         void bindNotifyService();
         void unbindNotifyService();
         boolean getNotifyServiceState();
+        void enterInUIthread();
         void updateUiBattery(String value, String res);
         void updateUiNetwork(String network);
         void updateUiBacklight(int value);
@@ -28,6 +29,7 @@ public interface MVPfragmentConnectToServer {
         void checkboxChecked(boolean enabled);
         void seekbarBacklightChanged(int value);
         void seekbarSoundChanged(int value);
+        void inUIthread();
         void fragmentPause();
         void fragmentResume();
         void fragmentDestroy();

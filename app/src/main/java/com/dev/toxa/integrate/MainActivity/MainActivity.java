@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
 
     @Override
     public Context getContext() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         return this;
     }
 
@@ -174,8 +175,8 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
 
     @Override
     public void onResume(){
-        super.onResume();
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        super.onResume();
 //        if (presenterFragmentConnectToServer != null) {
 //            String actionSend = Intent.ACTION_SEND;
 //            String actionMultiple = Intent.ACTION_SEND_MULTIPLE;
@@ -190,23 +191,25 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
 
     @Override
     public void onPause() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onDestroy();
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onSaveInstanceState(savedInstanceState);
-
-
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onRestoreInstanceState(savedInstanceState);
     }
     //==================================================================================================================
@@ -217,6 +220,12 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         moveTaskToBack(true);
     }
 
+    @Override
+    public void onBackPressed() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        presenterFragmentListServers.onDestroy();
+        super.onBackPressed();
+    }
 
     //==================================================================================================================
 }

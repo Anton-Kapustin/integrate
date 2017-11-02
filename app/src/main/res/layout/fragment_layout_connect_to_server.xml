@@ -14,7 +14,7 @@
             <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="0dp"
+                    android:layout_margin = "0dp"
                     android:padding="0dp" tools:ignore="UselessParent"
                     android:id="@+id/layout_star">
 
@@ -26,6 +26,7 @@
                         android:layout_alignParentStart="false"
                         android:layout_gravity="center_vertical"
                         android:layout_alignParentLeft="false"
+                        android:layout_margin="0dp"
                         tools:ignore="RelativeOverlap,RtlHardcoded,UseCompoundDrawables" android:layout_alignWithParentIfMissing="false"
                         android:layout_centerHorizontal="false" android:gravity="left"
                         android:layout_centerVertical="true" android:layout_centerInParent="true">
@@ -55,7 +56,7 @@
                                 android:gravity="right|center_vertical" android:elevation="0dp"
                                 android:layout_marginLeft="0dp"
                                 android:layout_alignParentTop="false" android:layout_alignParentEnd="false"
-                                android:layout_marginEnd="10dp" android:layout_alignParentRight="true"
+                                android:layout_marginRight="10dp" android:layout_alignParentRight="true"
                                 android:layout_centerVertical="false"/>
             </RelativeLayout>
 
@@ -63,19 +64,22 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/layout_Status"
                 android:background="@drawable/shadow_134848"
-                android:gravity="center_vertical"
-                android:layout_width="wrap_content"
-                tools:ignore="ExtraText">>
+                android:layout_margin = "0dp"
+                android:padding="0dp"
+                android:layout_width="match_parent">
             <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/layout_batteryStatus"
+                    android:layout_marginLeft="20dp"
+                    android:padding="0dp"
                     android:layout_alignParentStart="false"
-                    android:layout_gravity="right|center_vertical"
-                    android:gravity="center_vertical"
-                    android:layout_alignParentLeft="false"
-                    tools:ignore="RtlHardcoded,UseCompoundDrawables">
+                    android:layout_gravity="left|center_vertical"
+                    android:gravity="left|center_vertical"
+                    tools:ignore="RtlHardcoded,UseCompoundDrawables"
+                    android:layout_centerVertical="true" android:layout_centerInParent="false"
+                    android:layout_alignParentRight="false" android:layout_alignParentLeft="true">
 
                 <ImageView
                         android:layout_width="wrap_content"
@@ -83,6 +87,8 @@
                         app:srcCompat="@drawable/ic_battery_std_black_24dp"
                         android:id="@+id/imageView_battery"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginLeft = "10dp"
+                        android:padding="0dp"
                         android:contentDescription=""
                         tools:ignore="ContentDescription"/>
                 <TextView
@@ -90,6 +96,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/batteryStatus"
+                        android:layout_margin = "0dp"
+                        android:padding="0dp"
                         android:clickable="true"
                         android:gravity="left|center_vertical"/>
             </LinearLayout>
@@ -100,11 +108,13 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/layout_networkStatus"
                     android:layout_alignParentStart="false"
-                    android:layout_gravity="right|center_vertical"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="20dp"
                     android:layout_alignParentEnd="false"
-                    android:layout_alignParentRight="true"
-                    android:gravity="center_vertical"
-                    tools:ignore="RelativeOverlap,RtlHardcoded,UseCompoundDrawables">
+                    android:gravity="center_vertical" android:layout_centerVertical="true"
+                    tools:ignore="RelativeOverlap,RtlHardcoded,UseCompoundDrawables"
+                    android:layout_centerInParent="false" android:layout_centerHorizontal="false"
+                    android:layout_alignParentRight="true">
                 <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

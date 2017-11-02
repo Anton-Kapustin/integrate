@@ -40,6 +40,8 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         this.view = view;
     }
 
+    //============================================Нажития на кнопки/чекбоксы============================================
+
     @Override
     public void checkboxChecked(boolean enabled) {
         modelFragmentConnectToServer.setFavorite(enabled);
@@ -66,6 +68,8 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
 
     }
 
+    //=============================================Жизненный цикл фрагмента=============================================
+
     @Override
     public void fragmentPause() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
@@ -90,6 +94,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         }
     }
 
+    //============================================Запуск - Остановка сервера============================================
     @Override
     public void startServer() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
@@ -114,20 +119,34 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         modelFragmentConnectToServer.setInUse(false);
     }
 
+    //=============================================Получение данных о телефоне==========================================
+
+    public void threadToUI(){
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        view.enterInUIthread();
+    }
+
+    @Override
+    public void inUIthread() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        sendPhoneInfo();
+    }
+
     @Override
     public void sendPhoneInfo() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         if (view != null) {
             String message = "phone_info////" + "battery " + view.getBatteryState() + "&" + "network " +  view.getNetworkState();
+            Log.d(LOG_TAG, "message: " + message);
             String IP = modelFragmentConnectToServer.getCurrentIP();
             connectToServer.sendMessage(IP, message);
         } else {
             Log.d(LOG_TAG, "null view");
         }
-
     }
+    //==================================================================================================================
 
-    @Override
+    @Override //Обновление данных о ПК
     public void updateData(JSONObject jsonData) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         view.updateServerName(modelFragmentConnectToServer.getCurrentServerName());
@@ -214,7 +233,8 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         }
     }
 
-    @Override
+    //================================================Уведомления из телефона===========================================
+    @Override //Уведомление
     public void notifyPosted(String appName, String title, String text) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         Log.d(LOG_TAG, "Notify posted: " + appName + " " + title + " " + text);
@@ -222,11 +242,13 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), message);
     }
 
-    @Override
+    @Override //Звонок
     public void calling(String appName, String title, String text) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         Log.d(LOG_TAG, "Calling: " + appName + " " + title + " " + text);
         String message = "notify////name: " + appName + "/ " + "title: " + title + "/ " + "text: " + text;
         connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), message);
     }
+
+    //==================================================================================================================
 }

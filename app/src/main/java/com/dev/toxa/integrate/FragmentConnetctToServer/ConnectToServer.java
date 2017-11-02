@@ -70,7 +70,7 @@ public class ConnectToServer {
                     try {
                         jsonReceive = server.receive();
                         if (jsonReceive.has("phone")) {
-                            presenterFragmentConnectToServer.sendPhoneInfo();
+                            presenterFragmentConnectToServer.threadToUI();
                         }
                         if (jsonReceive.has("PC_info")) {
                             Log.d(LOG_TAG, "Получено: " + jsonReceive.toString());

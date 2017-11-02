@@ -67,6 +67,7 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
         serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
                 serviceFindServers = ((ServiceFindServers.ServiceFindBinder) iBinder).getService();
                 if (!serviceFindServers.getConnection()) {
                     serviceFindServers.setPresenter(presenter);
@@ -78,6 +79,9 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
+                Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+//                serviceFindServers.stopService();
+                serviceFindServers = null;
                 serviceBound = false;
                 Log.d(LOG_TAG, "Сервис поиска отключен");
             }
@@ -101,24 +105,25 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
 
     @Override
     public void onPause() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         presenter.onPause();
         super.onPause();
-        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
     }
 
     @Override
     public void onResume() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onResume();
         presenter.onResume();
-
-        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
     }
 
     @Override
     public void onDestroy() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         presenter.onDestroy();
-        presenter.clearData();
         super.onDestroy();
+        presenter.clearData();
+
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
     }
 
@@ -159,18 +164,21 @@ public class FragmentListServers extends Fragment implements MVPfragmentListServ
     @Override
     public void bindSearchService() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        Log.d(LOG_TAG, "status service connection: " + serviceBound);
         context.bindService(intentSearchServer, serviceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
     public void unBindSearchService() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        if (serviceBound) {
+        Log.d(LOG_TAG, "status service connection: " + serviceBound);
+        if (serviceFindServers != null) {
             serviceFindServers.setPresenter(null);
+            serviceFindServers.stopService();
             context.unbindService(serviceConnection);
+            serviceFindServers = null;
             Log.d(LOG_TAG, "Сервис отключен");
-        } else {
-            Log.d(LOG_TAG, "Сервис не запущен");
+            serviceBound = false;
         }
     }
 

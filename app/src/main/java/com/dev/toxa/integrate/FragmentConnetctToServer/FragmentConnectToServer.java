@@ -23,6 +23,7 @@ import static android.content.Context.BIND_AUTO_CREATE;
 public class FragmentConnectToServer extends Fragment implements MVPfragmentConnectToServer.view {
 
     //==========================================Переменные==============================================================
+
     private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
 
     Context context;
@@ -52,6 +53,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     Intent intentServiceNotify;
     ServiceConnection serviceConnectionNotify;
     ServiceNotifyListener serviceNotifyListener;
+
     //==================================================================================================================
 
     @Override
@@ -208,31 +210,37 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
             text_serverName.setText(savedInstanceState.getString("text_serverName"));
         }
     }
+
     //===========================================Показания датчиков=====================================================
+
+    @Override
+    public void enterInUIthread() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                presenter.inUIthread();
+            }
+        });
+    }
 
     @Override
     public String getBatteryState() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        final String[] state = {""};
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int chargeStatus = 0;
-                BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
-                int level = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-                chargeStatus = batteryState.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-                boolean isCharging = chargeStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
-                        chargeStatus == BatteryManager.BATTERY_STATUS_FULL;
-                state[0] = String.valueOf(level);
-                if (isCharging) {
-                    state[0] += " charging";
-                }
-                Log.d(LOG_TAG, "Заряд батареи телефона: " + level);
-                Log.d(LOG_TAG, "Статус зарядки: " + isCharging);
-            }
-        });
-        Log.d(LOG_TAG, "state[0]: " + state[0]);
-        return state[0];
+        String state = "";
+        int chargeStatus = 0;
+        BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
+        int level = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        chargeStatus = batteryState.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        boolean isCharging = chargeStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
+                chargeStatus == BatteryManager.BATTERY_STATUS_FULL;
+        state = String.valueOf(level);
+        if (isCharging) {
+            state += " charging";
+        }
+        Log.d(LOG_TAG, "Заряд батареи телефона: " + level);
+        Log.d(LOG_TAG, "Статус зарядки: " + isCharging);
+        return state;
     }
 
     @Override
@@ -284,7 +292,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                batteryStatus.setText(value);
+                batteryStatus.setText(value + "%");
                 imageView_battery.setImageResource(activity.getResources().getIdentifier(res,  "drawable", context.getPackageName()));
             }
         });
@@ -345,6 +353,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
             }
         });
     }
+
     //==================================================================================================================
 }
 
