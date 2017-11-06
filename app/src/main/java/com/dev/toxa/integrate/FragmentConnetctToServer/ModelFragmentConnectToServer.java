@@ -3,10 +3,13 @@ package com.dev.toxa.integrate.FragmentConnetctToServer;
 import android.util.Log;
 import com.dev.toxa.integrate.LoggingNameClass;
 import com.dev.toxa.integrate.db.DbHelper;
+import com.dev.toxa.integrate.ActivitySharing.ObservableShare;
 
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
-public class ModelFragmentConnectToServer {
+public class ModelFragmentConnectToServer implements Observer{
 
     private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
 
@@ -16,8 +19,15 @@ public class ModelFragmentConnectToServer {
     private String currentDistr = null;
     private boolean isFavorite = false;
     private DbHelper dbHelper;
+    private ObservableShare observableShare = ObservableShare.getInstance();
+    private PresenterFragmentConnectToServer presenter;
+
+    public ModelFragmentConnectToServer (PresenterFragmentConnectToServer presenter) {
+        this.presenter = presenter;
+    }
 
     public void setDbHelper(DbHelper dbHelper) {
+        observableShare.addObserver(this);
         this.dbHelper = dbHelper;
     }
 
@@ -67,5 +77,12 @@ public class ModelFragmentConnectToServer {
     public boolean getIsFavorite() {
         Log.d(LOG_TAG, "isFavorite: " + isFavorite);
         return isFavorite;
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        Log.d(LOG_TAG, "obj: " + o);
+        presenter.sendSharedLink((String) o);
     }
 }

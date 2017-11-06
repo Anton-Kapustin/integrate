@@ -21,7 +21,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
     private MVPfragmentConnectToServer.view view;
 
     private ConnectToServer connectToServer = new ConnectToServer(this);
-    private ModelFragmentConnectToServer modelFragmentConnectToServer = new ModelFragmentConnectToServer();
+    private ModelFragmentConnectToServer modelFragmentConnectToServer = new ModelFragmentConnectToServer(this);
     boolean statusConnection = false;
     DbHelper dbHelper;
     Timer timer;
@@ -230,6 +230,14 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Json error: " + e);
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void sendSharedLink(String sharedText) {
+        if (sharedText != null) {
+            connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), sharedText);
+            Log.d(LOG_TAG, "отправлено");
         }
     }
 

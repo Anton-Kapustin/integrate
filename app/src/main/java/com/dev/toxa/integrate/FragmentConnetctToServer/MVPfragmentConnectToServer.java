@@ -29,6 +29,7 @@ public interface MVPfragmentConnectToServer {
         void checkboxChecked(boolean enabled);
         void seekbarBacklightChanged(int value);
         void seekbarSoundChanged(int value);
+        void sendSharedLink(String sharedText);
         void inUIthread();
         void fragmentPause();
         void fragmentResume();

@@ -1,12 +1,16 @@
 package com.dev.toxa.integrate.ActivitySharing;
 
+import android.content.Intent;
+
 public interface MVPactivitySharing {
 
     interface view {
-
+        String getSharedText();
+        void handleSendImage();
+        void handleSendMultipleImages();
+        void finishActivity();
     }
     interface presenter {
-        void setSharingIntent(String actionSend, String actionMultiple, String actionReceive, String typeReceive);
-        void sendLink(String link);
+        void activityCreated(String action, String type);
     }
 }

@@ -24,31 +24,34 @@ public class PresenterMain implements MVPmain.presenter{
     }
 
     @Override
-    public void OnResume(String actionSend, String actionMultiple, String actionReceive, String typeReceive) {
+    public void ActivityOnResume(String action, String type, String sharedText) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        if (actionSend.equals(actionReceive) && typeReceive != null) {
-            if ("text/plain".equals(typeReceive)) {
+        String actionAndroidSend = "android.intent.action.SEND";
+        String actionAndroidMultiple = "android.intent.action.SEND_MULTIPLE";
+        Log.d(LOG_TAG, "action share: " + action);
+        if (action.equals(actionAndroidSend) && type != null) {
+            if ("text/plain".equals(type)) {
                 Log.d(LOG_TAG, "SHARING TEXT");
-//                view.getShareLink();
+                view.passShareToPresenterConnect(sharedText);
 //                view.minimazeActivity();
                 Log.d(LOG_TAG, "Закртытие активности");
-            } else if (typeReceive.startsWith("image/")) {
+            } else if (type.startsWith("image/")) {
                 Log.d(LOG_TAG, "SHARING single image");
             }
-//        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
-//            if (type.startsWith("image/")) {
-//                Log.d(LOG_TAG, "SHARING multiple image");
-//            }
+        } else if (action.equals(actionAndroidMultiple) && type != null) {
+            if (type.startsWith("image/")) {
+                Log.d(LOG_TAG, "SHARING multiple image");
+            }
         }
     }
 
     @Override
-    public void OnPause() {
+    public void ActivityOnPause() {
 
     }
 
     @Override
-    public void OnDestroy() {
+    public void ActivityOnDestroy() {
 
     }
 

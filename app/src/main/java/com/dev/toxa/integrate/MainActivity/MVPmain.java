@@ -15,6 +15,7 @@ public interface MVPmain {
         PresenterFragmentConnectToServer setFragmentConnectToServer(MVPfragmentConnectToServer.view view);
         PresenterFragmentListServers setFragmentListServers(MVPfragmentListServers.view view);
         PresenterFragmentSettings setFragmentSettings(MVPFragmentSettings.view view);
+        void passShareToPresenterConnect(String shared);
         boolean checkPermissions();
         void minimazeActivity();
     }
@@ -22,8 +23,8 @@ public interface MVPmain {
     interface presenter {
 
         void activityLoaded();
-        void OnResume(String actionSend, String actionMultiple, String actionReceive, String typeReceive);
-        void OnPause();
-        void OnDestroy();
+        void ActivityOnResume(String actionSend, String type, String sharedText);
+        void ActivityOnPause();
+        void ActivityOnDestroy();
     }
 }

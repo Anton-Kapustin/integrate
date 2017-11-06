@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     PresenterFragmentConnectToServer presenterFragmentConnectToServer;
     PresenterFragmentSettings presenterFragmentSettings;
 
-    Intent intentShare;
-
     private static final int MY_PERMISSION_ACCESS_COURSE_NOTIFICATION = 1;
 
     @Override
@@ -59,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         tabLayout.setupWithViewPager(viewPager);
         presenterMain.activityLoaded();
+
+        Log.d(LOG_TAG, "action: " + getIntent().getAction() + " gategory: " + getIntent().getCategories());
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -126,9 +126,12 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         });
     }
 
+    @Override
+    public void passShareToPresenterConnect(String shared) {
+        presenterFragmentConnectToServer.sendSharedLink(shared);
+    }
+
     //=============================================Проверка разрешений==================================================
-
-
 
     @Override
     public boolean checkPermissions() {
@@ -177,16 +180,15 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     public void onResume(){
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onResume();
-//        if (presenterFragmentConnectToServer != null) {
-//            String actionSend = Intent.ACTION_SEND;
-//            String actionMultiple = Intent.ACTION_SEND_MULTIPLE;
-//            intentShare = getIntent();
-//            String action = intentShare.getAction();
-//            String type = intentShare.getType();
-//            presenterMain.OnResume(actionSend, actionMultiple, action, type);
-//        } else {
-//            Log.d(LOG_TAG, "presenter connect null");
-//        }
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        presenterMain.ActivityOnResume(action, type, sharedText);
+        Log.d(LOG_TAG, "action send: " + action);
+        if (sharedText != null) {
+            Log.d(LOG_TAG, "action text: " + sharedText);
+        }
     }
 
     @Override
@@ -225,6 +227,13 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         presenterFragmentListServers.onDestroy();
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        super.onNewIntent(intent);
+        setIntent(intent);
     }
 
     //==================================================================================================================

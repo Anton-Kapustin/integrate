@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import com.dev.toxa.integrate.ActivitySharing.ObservableShare;
 import com.dev.toxa.integrate.LoggingNameClass;
 import com.dev.toxa.integrate.db.DbReaderContract.dbEntry;
 import com.dev.toxa.integrate.db.DbReaderContract.settingsEntry;
@@ -199,5 +200,11 @@ public class DbHelper extends SQLiteOpenHelper {
         } else {
             return true;
         }
+    }
+
+    public void shared() {
+        ObservableShare observableShare = ObservableShare.getInstance();
+//        observableShare.setShareChanged("He");
+        observableShare.notifyObservers("HE");
     }
 }
