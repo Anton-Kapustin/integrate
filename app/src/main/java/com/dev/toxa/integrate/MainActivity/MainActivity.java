@@ -180,15 +180,6 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     public void onResume(){
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onResume();
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
-        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-        presenterMain.ActivityOnResume(action, type, sharedText);
-        Log.d(LOG_TAG, "action send: " + action);
-        if (sharedText != null) {
-            Log.d(LOG_TAG, "action text: " + sharedText);
-        }
     }
 
     @Override
@@ -227,13 +218,6 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         presenterFragmentListServers.onDestroy();
         super.onBackPressed();
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        super.onNewIntent(intent);
-        setIntent(intent);
     }
 
     //==================================================================================================================
