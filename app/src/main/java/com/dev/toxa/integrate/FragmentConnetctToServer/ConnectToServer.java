@@ -30,82 +30,88 @@ public class ConnectToServer {
             @Override
             public void run() {
                 Log.d(LOG_TAG, "IP: " + IP);
-                try {
                     clientConnect = new ClientConnect();
-                    clientConnect.connect(IP, port);
-                    clientConnect.send(message);
+                    if (sendMessageToServer(IP, message)) {
                     presenterFragmentConnectToServer.startServer();
-                    clientConnect.close();
-                } catch (IOException e) {
-                    connectionCount ++;
-                    Log.d(LOG_TAG, "count: " + connectionCount);
-                    if (connectionCount == 4) {
-                        presenterFragmentConnectToServer.stopServer();
+                        try {
+                            clientConnect.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        connectionCount = 0;
+                    } else {
+                        connectionCount ++;
+                        Log.d(LOG_TAG, "count: " + connectionCount);
                     }
-                    e.printStackTrace();
-                }
+                    if (connectionCount == 1) {
+                        presenterFragmentConnectToServer.stopServer();
+                        connectionCount = 0;
+                    }
             }
         });
         thread.start();
     }
 
-    public void runServer(String IP) {
+    private boolean sendMessageToServer (String IP, String message) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        if (clientConnect.connect(IP, port)) {
+            clientConnect.send(message);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void runServer(final String IP) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                int port = 18031;
-                int count = 0;
-                connectionState = true;
-                while (connectionState) {
-                    try {
-                        Log.d(LOG_TAG, "Запуск сервера");
-                        server = new ServerConnect(port);
-                        server.connect();
-                    } catch (IOException e) {
-                        Log.e(LOG_TAG, "Server Connect error");
-                    }
-
-                    Log.d(LOG_TAG, "Получение комманд");
-                    JSONObject jsonReceive = null;
-                    try {
-                        jsonReceive = server.receive();
-                        if (jsonReceive.has("phone")) {
-                            presenterFragmentConnectToServer.threadToUI();
-                        }
-                        if (jsonReceive.has("PC_info")) {
-                            Log.d(LOG_TAG, "Получено: " + jsonReceive.toString());
-                            presenterFragmentConnectToServer.updateData(jsonReceive);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (NullPointerException e) {
-                        Log.d(LOG_TAG, "null error: " + e);
-                    }
-                    try {
-                        server.close();
-                    } catch (IOException e) {
-                        Log.d(LOG_TAG, "server close error");
-                        e.printStackTrace();
-                    }
-                    Log.d(LOG_TAG, "Соединение разорвано");
+                while (presenterFragmentConnectToServer.getStatusConnection()) {
+                    startServerForReceive(IP);
                 }
             }
         });
         thread.start();
     }
 
-    public void setConnetionState(boolean state) {
-        connectionState = state;
+    private void startServerForReceive(String IP) {
+        int port = 18031;
+        int count = 0;
+        try {
+            Log.d(LOG_TAG, "Запуск сервера connectionState: " + connectionState);
+            server = new ServerConnect(port);
+            server.connect();
+            connectionState = true;
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Server Connect error");
+        }
+        Log.d(LOG_TAG, "Получение комманд");
+        JSONObject jsonReceive = null;
+        try {
+            jsonReceive = server.receive();
+            if (jsonReceive.has("phone")) {
+                presenterFragmentConnectToServer.threadToUI();
+            }
+            if (jsonReceive.has("PC_info")) {
+                Log.d(LOG_TAG, "Получено: " + jsonReceive.toString());
+                presenterFragmentConnectToServer.updateData(jsonReceive);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            Log.d(LOG_TAG, "null error: " + e);
+        }
+        try {
+            server.close();
+        } catch (IOException e) {
+            Log.d(LOG_TAG, "server close error");
+            e.printStackTrace();
+        }
+        Log.d(LOG_TAG, "Соединение разорвано");
     }
 
     public boolean getConnectionState() {
         return connectionState;
-    }
-
-    interface CallbackToPresenter {
-        void startServer();
-        void stopServer();
-        void sendPhoneInfo();
-        void updateData(JSONObject jsonData);
     }
 }

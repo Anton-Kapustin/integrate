@@ -1,9 +1,12 @@
 package com.dev.toxa.integrate.FragmentConnetctToServer;
 
 import android.app.Notification;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
@@ -99,6 +102,19 @@ public class ServiceNotifyListener extends NotificationListenerService {
     public void onNotificationRemoved(StatusBarNotification statusBarNotification){
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         Log.d(LOG_TAG, "Message remove");
+    }
+
+    public void stoppingNotifyService() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            requestUnbind();
+        } else {
+            PackageManager pm  = getApplicationContext().getPackageManager();
+            ComponentName componentName = new ComponentName(getPackageName(),
+                    ".ServiceNotifyListener");
+            pm.setComponentEnabledSetting(componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+        }
     }
 
     @Override

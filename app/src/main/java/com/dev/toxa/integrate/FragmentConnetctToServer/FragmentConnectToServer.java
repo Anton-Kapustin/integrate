@@ -1,6 +1,7 @@
 package com.dev.toxa.integrate.FragmentConnetctToServer;
 
 import android.content.*;
+import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -182,6 +183,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
 
     @Override
     public void onDestroy() {
+        presenter.fragmentDestroy();
         super.onDestroy();
     }
 
@@ -257,12 +259,21 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
 
     @Override
     public void bindNotifyService() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        PackageManager pm  = activity.getApplicationContext().getPackageManager();
+        ComponentName componentName = new ComponentName(activity.getContext(), ServiceNotifyListener.class);
+        pm.setComponentEnabledSetting(componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
         context.bindService(intentServiceNotify, serviceConnectionNotify, BIND_AUTO_CREATE);
     }
 
     @Override
     public void unbindNotifyService() {
-        context.unbindService(serviceConnectionNotify);
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        if (serviceConnectionNotify != null) {
+            context.unbindService(serviceConnectionNotify);
+        }
     }
 
     @Override
@@ -272,11 +283,14 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
 
     @Override
     public void stopNotifyService() {
-        context.stopService(intentServiceNotify);
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        serviceNotifyListener.stoppingNotifyService();
+//        context.stopService(intentServiceNotify);
     }
 
     @Override
     public boolean getNotifyServiceState() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         if (serviceNotifyListener != null) {
             return true;
         } else {

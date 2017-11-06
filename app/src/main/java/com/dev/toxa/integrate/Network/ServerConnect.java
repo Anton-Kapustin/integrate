@@ -20,10 +20,6 @@ public class ServerConnect {
     private int port;
     private ServerSocket serverSocket = null;
     private Socket socket = null;
-//    private DataInputStream inString = null;
-//    private DataOutputStream outString = null;
-//    private ObjectInputStream inObject = null;
-//    private ObjectOutputStream outObject = null;
     InputStream inString = null;
     OutputStream outString =null;
     public boolean connection = false;
@@ -157,12 +153,18 @@ public class ServerConnect {
 //    }
 
     public void close() throws IOException {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
 //        inObject.close();
 //        outObject.close();
-        outString.close();
-        inString.close();
-        socket.close();
-        serverSocket.close();
+        try {
+            outString.close();
+            inString.close();
+            socket.close();
+            serverSocket.close();
+            Log.d(LOG_TAG, "server connect close");
+        } catch (NullPointerException e) {
+            Log.e(LOG_TAG, "closing streams error: " + e);
+        }
     }
 
 

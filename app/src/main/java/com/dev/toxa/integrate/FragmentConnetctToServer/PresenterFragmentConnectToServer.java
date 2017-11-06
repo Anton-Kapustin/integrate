@@ -11,7 +11,7 @@ import java.util.TimerTask;
 
 
 public class PresenterFragmentConnectToServer implements MVPfragmentConnectToServer.presenter,
-        ConnectToServer.CallbackToPresenter, ServiceNotifyListener.CallbackToPressenter {
+         ServiceNotifyListener.CallbackToPressenter {
 
     //===================================Переменные=====================================================================
     private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
@@ -90,12 +90,12 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
     public void fragmentDestroy() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         if (view.getNotifyServiceState()) {
-//            view.unbindNotifyService();
+            view.unbindNotifyService();
         }
     }
 
     //============================================Запуск - Остановка сервера============================================
-    @Override
+
     public void startServer() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         if (!(connectToServer.getConnectionState())) {
@@ -106,17 +106,24 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
                     sendPhoneInfo();
                 }
             };
-            timer.schedule(timerTask, 60000, 60000);
+            timer.schedule(timerTask, 60000, 10000);
+            statusConnection = true;
             connectToServer.runServer(modelFragmentConnectToServer.getCurrentIP());
             view.bindNotifyService();
         }
     }
 
-    @Override
+
     public void stopServer() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        connectToServer.setConnetionState(false);
+        timer.cancel();
+        statusConnection = false;
         modelFragmentConnectToServer.setInUse(false);
+        view.unbindNotifyService();
+    }
+
+    public boolean getStatusConnection() {
+        return statusConnection;
     }
 
     //=============================================Получение данных о телефоне==========================================
@@ -132,7 +139,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         sendPhoneInfo();
     }
 
-    @Override
+
     public void sendPhoneInfo() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         if (view != null) {
@@ -146,7 +153,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
     }
     //==================================================================================================================
 
-    @Override //Обновление данных о ПК
+     //Обновление данных о ПК
     public void updateData(JSONObject jsonData) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         view.updateServerName(modelFragmentConnectToServer.getCurrentServerName());

@@ -26,7 +26,7 @@ public class ClientConnect {
 
 
 
-    public void connect(String ip, int port) {
+    public boolean connect(String ip, int port) {
         if (ip != null) {
             try {
                 this.ip = InetAddress.getByName(ip);
@@ -55,6 +55,7 @@ public class ClientConnect {
                 Log.e(LOG_TAG, "Open Connection Error");
             }
         }
+        return connection;
     }
 
 
