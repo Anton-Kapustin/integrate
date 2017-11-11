@@ -2,6 +2,8 @@ package com.dev.toxa.integrate.FragmentConnetctToServer;
 
 import android.util.Log;
 import com.dev.toxa.integrate.LoggingNameClass;
+import com.dev.toxa.integrate.Network.ClientConnect;
+import com.dev.toxa.integrate.Network.ServerConnect;
 import com.dev.toxa.integrate.db.DbHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,23 +16,19 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
          ServiceNotifyListener.CallbackToPressenter {
 
     //===================================Переменные=====================================================================
-    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
-
-    private  String sayHello = "Hello, add me to access list";
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName())) + " ";
 
     private MVPfragmentConnectToServer.view view;
 
-    private ConnectToServer connectToServer = new ConnectToServer(this);
     private ModelFragmentConnectToServer modelFragmentConnectToServer = new ModelFragmentConnectToServer(this);
-    boolean statusConnection = false;
-    DbHelper dbHelper;
-    Timer timer;
+    private boolean statusConnection = false;
+    private Timer timer;
     //==================================================================================================================
 
     public PresenterFragmentConnectToServer (MVPfragmentConnectToServer.view view) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         this.view = view;
-        dbHelper = new DbHelper(view.getFragmentcontext(), 1);
+        DbHelper dbHelper = new DbHelper(view.getFragmentcontext(), 1);
         modelFragmentConnectToServer.setDbHelper(dbHelper);
     }
 
@@ -52,19 +50,19 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         modelFragmentConnectToServer.getServerDataFromID(serverID);
         view.setCheckbox(modelFragmentConnectToServer.getIsFavorite());
         view.bindNotifyService();
-        connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), "info");
+        sendMessage("info");
     }
 
     @Override
     public void seekbarBacklightChanged(int value) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), "backlight////" + value);
+        sendMessage("backlight////" + value);
     }
 
     @Override
     public void seekbarSoundChanged(int value) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), "sound////" + value);
+        sendMessage("sound////" + value);
 
     }
 
@@ -74,15 +72,15 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
     public void fragmentPause() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         if (view.getNotifyServiceState()) {
-//            view.unbindNotifyService();
+            view.unbindNotifyService();
         }
     }
 
     @Override
     public void fragmentResume() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        if (view.getNotifyServiceState()) {
-//            view.bindNotifyService();
+        if (!(view.getNotifyServiceState())) {
+            view.bindNotifyService();
         }
     }
 
@@ -94,11 +92,21 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         }
     }
 
-    //============================================Запуск - Остановка сервера============================================
+    //============================================Взаимодествие с сервером==============================================
 
     public void startServer() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        if (!(connectToServer.getConnectionState())) {
+        Log.d(LOG_TAG, "statusConnection: " + statusConnection);
+        if (!(statusConnection)) {
+            final ServerConnect server = new ServerConnect(this);
+            statusConnection = true;
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    server.runServer();
+                }
+            });
+            thread.start();
             timer = new Timer();
             TimerTask timerTask = new TimerTask() {
                 @Override
@@ -106,20 +114,44 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
                     sendPhoneInfo();
                 }
             };
-            timer.schedule(timerTask, 60000, 10000);
-            statusConnection = true;
-            connectToServer.runServer(modelFragmentConnectToServer.getCurrentIP());
-            view.bindNotifyService();
+            timer.schedule(timerTask, 10000, 20000);
         }
     }
-
 
     public void stopServer() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         timer.cancel();
         statusConnection = false;
         modelFragmentConnectToServer.setInUse(false);
-        view.unbindNotifyService();
+        view.stopNotifyService();
+    }
+
+    private void sendMessage(final String message) {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        final ClientConnect client = new ClientConnect(this);
+        final String IP = modelFragmentConnectToServer.getCurrentIP();
+        Log.d(LOG_TAG, "Даннык для отправки: " + message);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                client.sendToServer(IP, message);
+            }
+        });
+        thread.start();
+    }
+
+    public void dataFromServerReceive(JSONObject receivedData) {
+        try {
+            if (receivedData.has("phone")) {
+                threadToUI();
+        }
+            if (receivedData.has("PC_info")) {
+                Log.d(LOG_TAG, "Получено: " + receivedData.toString());
+                updateData(receivedData);
+            }
+        } catch (NullPointerException e) {
+        Log.d(LOG_TAG, "null error: " + e);
+        }
     }
 
     public boolean getStatusConnection() {
@@ -128,7 +160,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
 
     //=============================================Получение данных о телефоне==========================================
 
-    public void threadToUI(){
+    private void threadToUI(){
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         view.enterInUIthread();
     }
@@ -139,14 +171,12 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         sendPhoneInfo();
     }
 
-
-    public void sendPhoneInfo() {
+    private void sendPhoneInfo() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         if (view != null) {
-            String message = "phone_info////" + "battery " + view.getBatteryState() + "&" + "network " +  view.getNetworkState();
+            final String message = "phone_info////" + "battery " + view.getBatteryState() + "&" + "network " +  view.getNetworkState();
             Log.d(LOG_TAG, "message: " + message);
-            String IP = modelFragmentConnectToServer.getCurrentIP();
-            connectToServer.sendMessage(IP, message);
+            sendMessage(message);
         } else {
             Log.d(LOG_TAG, "null view");
         }
@@ -154,7 +184,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
     //==================================================================================================================
 
      //Обновление данных о ПК
-    public void updateData(JSONObject jsonData) {
+    private void updateData(JSONObject jsonData) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         view.updateServerName(modelFragmentConnectToServer.getCurrentServerName());
         view.updateServerLogo(modelFragmentConnectToServer.getCurrentDistr());
@@ -217,7 +247,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
 
                 }
             }
-            String network = null;
+            String network;
             String net = jsonData.getString("network");
             String[] str = net.split(" ");
             network = str[str.length - 1];
@@ -225,7 +255,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
             view.updateUiNetwork(network);
             String back = jsonData.getString("backlight");
             Double val = Double.valueOf(back);
-            int backlight = Integer.valueOf(val.intValue());
+            int backlight = val.intValue();
             view.updateUiBacklight(backlight);
             String snd = jsonData.getString("sound").replaceAll("\\D+", "");
             try {
@@ -243,7 +273,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
     @Override
     public void sendSharedLink(String sharedText) {
         if (sharedText != null) {
-            connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), sharedText);
+            sendMessage(sharedText);
             Log.d(LOG_TAG, "отправлено");
         }
     }
@@ -254,7 +284,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         Log.d(LOG_TAG, "Notify posted: " + appName + " " + title + " " + text);
         String message = "notify////name: " + appName + "/ " + "title: " + title + "/ " + "text: " + text;
-        connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), message);
+        sendMessage(message);
     }
 
     @Override //Звонок
@@ -262,7 +292,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         Log.d(LOG_TAG, "Calling: " + appName + " " + title + " " + text);
         String message = "notify////name: " + appName + "/ " + "title: " + title + "/ " + "text: " + text;
-        connectToServer.sendMessage(modelFragmentConnectToServer.getCurrentIP(), message);
+        sendMessage(message);
     }
 
     //==================================================================================================================

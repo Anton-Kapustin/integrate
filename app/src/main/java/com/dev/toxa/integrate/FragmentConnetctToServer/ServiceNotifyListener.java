@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -16,15 +15,13 @@ import com.dev.toxa.integrate.LoggingNameClass;
 public class ServiceNotifyListener extends NotificationListenerService {
 
 
-    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
+    private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName())) + " ";
 
-    //==========================================Переменные==============================================================
-    Context context;
-    CallbackToPressenter presenter;
+    private CallbackToPressenter presenter;
 
-    NotifyServiceBinder binder = new NotifyServiceBinder();
+    private NotifyServiceBinder binder = new NotifyServiceBinder();
 
-    String action = "android.service.notification.NotificationListenerService";
+
 
     //==================================================================================================================
 
@@ -42,7 +39,6 @@ public class ServiceNotifyListener extends NotificationListenerService {
     public void onCreate() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onCreate();
-        context = getApplicationContext();
     }
 
     @Override
@@ -58,7 +54,7 @@ public class ServiceNotifyListener extends NotificationListenerService {
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        action = intent.getAction();
+        String action = intent.getAction();
         if (action != null) {
             return super.onBind(intent);
         } else {
@@ -104,16 +100,24 @@ public class ServiceNotifyListener extends NotificationListenerService {
         Log.d(LOG_TAG, "Message remove");
     }
 
-    public void stoppingNotifyService() {
+    public void rebindSystem() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            requestUnbind();
-        } else {
-            PackageManager pm  = getApplicationContext().getPackageManager();
-            ComponentName componentName = new ComponentName(getPackageName(),
-                    ".ServiceNotifyListener");
-            pm.setComponentEnabledSetting(componentName,
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP);
+            ComponentName componentName = new ComponentName(this, ServiceNotifyListener.class);
+            Log.d(LOG_TAG, "package: " + componentName.getPackageName());
+            Log.d(LOG_TAG, "class: " + componentName.getClassName());
+            requestRebind(componentName);
+        }
+    }
+
+    public void unBindSystem() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                requestUnbind();
+            } catch (SecurityException e) {
+                Log.e(LOG_TAG, "error unbind system from notity");
+            }
         }
     }
 

@@ -57,8 +57,6 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         tabLayout.setupWithViewPager(viewPager);
         presenterMain.activityLoaded();
-
-        Log.d(LOG_TAG, "action: " + getIntent().getAction() + " gategory: " + getIntent().getCategories());
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -105,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     @Override
     public PresenterFragmentConnectToServer setFragmentConnectToServer(MVPfragmentConnectToServer.view view) {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        presenterFragmentConnectToServer = (PresenterFragmentConnectToServer) getLastCustomNonConfigurationInstance();
         if (presenterFragmentConnectToServer != null) {
             presenterFragmentConnectToServer.setView(view);
         } else {
@@ -205,6 +204,13 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         super.onRestoreInstanceState(savedInstanceState);
     }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        return presenterFragmentConnectToServer;
+    }
+
     //==================================================================================================================
 
     @Override
@@ -217,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
     public void onBackPressed() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
         presenterFragmentListServers.onDestroy();
+        onRetainCustomNonConfigurationInstance();
         super.onBackPressed();
     }
 

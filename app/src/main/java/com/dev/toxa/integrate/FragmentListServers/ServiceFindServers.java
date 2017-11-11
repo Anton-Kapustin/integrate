@@ -73,13 +73,13 @@ public class ServiceFindServers extends Service {
             String macAddress = null;
             String distr = null;
             socketBroadcast = new DatagramSocket(18032);
-            Log.d(LOG_TAG, "Создан сервер udp");
+//            Log.d(LOG_TAG, "Создан сервер udp");
             byte[] buffer = new byte[256];
             DatagramPacket udpPacket = new DatagramPacket(buffer, buffer.length);
-            Log.d(LOG_TAG, "Создан пакет udp");
-            socketBroadcast.setSoTimeout(5000);
+//            Log.d(LOG_TAG, "Создан пакет udp");
+            socketBroadcast.setSoTimeout(7000);
             socketBroadcast.receive(udpPacket);
-            Log.d(LOG_TAG, "Получен пакет udp");
+//            Log.d(LOG_TAG, "Получен пакет udp");
             String broadcastMessage = new String(buffer, 0, udpPacket.getLength());
             if (broadcastMessage.contains("integrate")) {
                 InetAddress addr = udpPacket.getAddress();
@@ -90,13 +90,13 @@ public class ServiceFindServers extends Service {
                 for (int i = 0; i < array.length; i++) {
                     if (array[i].contains("name")) {
                         PCName = array[i].replaceAll("name: ", "");
-                        Log.d(LOG_TAG, "name: " + PCName);
+//                        Log.d(LOG_TAG, "name: " + PCName);
                     } else if (array[i].contains("mac")) {
                         macAddress = array[i].replaceAll("mac: ", "").replaceAll("\\s+","");
-                        Log.d(LOG_TAG, "Mac address: " + macAddress);
+//                        Log.d(LOG_TAG, "Mac address: " + macAddress);
                     } else if (array[i].contains("distr")) {
                         distr = array[i].replaceAll("distr: ", "");
-                        Log.d(LOG_TAG, "distr: " + distr);
+//                        Log.d(LOG_TAG, "distr: " + distr);
                     }
                 }
                 socketBroadcast.close();
@@ -120,7 +120,9 @@ public class ServiceFindServers extends Service {
             Log.e(LOG_TAG, "I/O error: " + e);
             e.printStackTrace();
         }
-        socketBroadcast.close();
+        if (socketBroadcast != null) {
+            socketBroadcast.close();
+        }
         Log.d(LOG_TAG, "broadcastReceiver close");
     }
 

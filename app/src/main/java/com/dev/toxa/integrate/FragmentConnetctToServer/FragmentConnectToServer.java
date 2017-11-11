@@ -1,7 +1,6 @@
 package com.dev.toxa.integrate.FragmentConnetctToServer;
 
 import android.content.*;
-import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -54,6 +53,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     Intent intentServiceNotify;
     ServiceConnection serviceConnectionNotify;
     ServiceNotifyListener serviceNotifyListener;
+    Boolean serviceNotifyBound = false;
 
     //==================================================================================================================
 
@@ -71,11 +71,14 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
                 Log.d(LOG_TAG, "Подключено к Notify Service");
                 serviceNotifyListener = ((ServiceNotifyListener.NotifyServiceBinder) iBinder).getService();
                 serviceNotifyListener.setPresenter(presenter);
+                serviceNotifyBound = true;
+//                serviceNotifyListener.rebindSystem();
             }
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
                 Log.d(LOG_TAG, "Отключен от Notify Service");
+                serviceNotifyBound = false;
             }
         };
     }
@@ -189,7 +192,6 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
 
         savedInstanceState.putString("batteryStatus", (String) batteryStatus.getText());
@@ -197,6 +199,7 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
         savedInstanceState.putString("text_backlight", (String) text_backlight.getText());
         savedInstanceState.putString("text_sound", (String) text_sound.getText());
         savedInstanceState.putString("text_serverName", (String) text_serverName.getText());
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -212,6 +215,8 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
             text_serverName.setText(savedInstanceState.getString("text_serverName"));
         }
     }
+
+
 
     //===========================================Показания датчиков=====================================================
 
@@ -260,19 +265,19 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     @Override
     public void bindNotifyService() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        PackageManager pm  = activity.getApplicationContext().getPackageManager();
-        ComponentName componentName = new ComponentName(activity.getContext(), ServiceNotifyListener.class);
-        pm.setComponentEnabledSetting(componentName,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
-        context.bindService(intentServiceNotify, serviceConnectionNotify, BIND_AUTO_CREATE);
+        if (!(serviceNotifyBound)) {
+            context.bindService(intentServiceNotify, serviceConnectionNotify, BIND_AUTO_CREATE);
+        }
     }
 
     @Override
     public void unbindNotifyService() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        if (serviceConnectionNotify != null) {
+        if (serviceNotifyBound) {
+//            serviceNotifyListener.unBindSystem();
             context.unbindService(serviceConnectionNotify);
+            serviceNotifyBound = false;
+            Log.d(LOG_TAG, "Отключен от Notify Service (unbind)");
         }
     }
 
@@ -284,14 +289,15 @@ public class FragmentConnectToServer extends Fragment implements MVPfragmentConn
     @Override
     public void stopNotifyService() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        serviceNotifyListener.stoppingNotifyService();
+//        serviceNotifyListener.unBindSystem();
+        unbindNotifyService();
 //        context.stopService(intentServiceNotify);
     }
 
     @Override
     public boolean getNotifyServiceState() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        if (serviceNotifyListener != null) {
+        if (serviceNotifyBound != null) {
             return true;
         } else {
             return false;

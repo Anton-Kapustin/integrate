@@ -1,6 +1,8 @@
 package com.dev.toxa.integrate.Network;
 
 import android.util.Log;
+import android.widget.TableRow;
+import com.dev.toxa.integrate.FragmentConnetctToServer.PresenterFragmentConnectToServer;
 import com.dev.toxa.integrate.LoggingNameClass;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,26 +19,35 @@ import java.util.Map;
 public class ServerConnect {
     private String LOG_TAG = (new LoggingNameClass().parseName(getClass().getName().toString())) + " ";
 
-    private int port;
+    private int port = 18031;
     private ServerSocket serverSocket = null;
     private Socket socket = null;
+    PresenterFragmentConnectToServer presenter = null;
+    //    private DataInputStream inString = null;
+//    private DataOutputStream outString = null;
+//    private ObjectInputStream inObject = null;
+//    private ObjectOutputStream outObject = null;
     InputStream inString = null;
     OutputStream outString =null;
     public boolean connection = false;
     String message = null;
     String cmd = null;
 
-
-    public ServerConnect(int port) throws IOException {
-        serverSocket = new ServerSocket(port);
-        Log.d(LOG_TAG, "New Server");
+//
+//    public ServerConnect(int port) throws IOException {
+//        serverSocket = new ServerSocket(port);
+//        Log.d(LOG_TAG, "New Server");
+//    }
+    public ServerConnect(PresenterFragmentConnectToServer presenter) {
+        this.presenter = presenter;
     }
 
     //  Старт сервера на порту
-    public void connect() {
+    public boolean connect() {
         try {
             Log.d(LOG_TAG,"Ожидание подключения");
             socket = serverSocket.accept();   //  Подключение клиента
+            connection = true;
             Log.d(LOG_TAG,"Подключено");
         } catch (SocketException e) {
             Log.e(LOG_TAG,"Connect error" + e);
@@ -44,19 +55,63 @@ public class ServerConnect {
         } catch (IOException e) {
             Log.e(LOG_TAG, "Connect error" + e);
             e.printStackTrace();
+            connection = false;
         }
         Log.d(LOG_TAG, "Открытие потоков");
-        connection = true;
-        start_output_stream();
-        try {
-            start_input_stream();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Start input stream error" + e);
-            e.printStackTrace();
+
+        return connection;
+//        start_output_stream();
+//        try {
+//            start_input_stream();
+//        } catch (IOException e) {
+//            Log.e(LOG_TAG, "Start input stream error" + e);
+//            e.printStackTrace();
+//        }
+    }
+
+    public void runServer() {
+        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
+        int errorCount = 0;
+        Log.d(LOG_TAG, "statusConnection: " + presenter.getStatusConnection());
+        while (presenter.getStatusConnection()) {
+            try {
+                serverSocket = new ServerSocket(port);
+                errorCount = 0;
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Ошибка открытия сокета на порту: " + port);
+                e.printStackTrace();
+                errorCount ++;
+                if (errorCount <= 3) {
+                    Log.e(LOG_TAG, "Ошибка запуска сервера");
+                    break;
+                }
+            }
+            while (presenter.getStatusConnection()) {
+                try {
+                    socket = serverSocket.accept();
+                    Thread serverThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                start_input_stream();
+                                JSONObject jsonObject = receive();
+                                presenter.dataFromServerReceive(jsonObject);
+                            } catch (IOException e) {
+                                Log.e(LOG_TAG, "Ошибка открытия входящего потока");
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    serverThread.start();
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Ошибка подключения к сокету :" + e);
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    private void start_input_stream() throws IOException {
+    public void start_input_stream() throws IOException {
         try {
             inString = socket.getInputStream();
 //            inString = new DataInputStream(socket.getInputStream());  // Создание потока на прием
@@ -74,7 +129,7 @@ public class ServerConnect {
 //        }
     }
 
-    private void start_output_stream() {
+    public void start_output_stream() {
         try {
             outString = socket.getOutputStream();
 //            outString = new DataOutputStream(socket.getOutputStream());   // Созадание потока на отпраку
@@ -153,7 +208,6 @@ public class ServerConnect {
 //    }
 
     public void close() throws IOException {
-        Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
 //        inObject.close();
 //        outObject.close();
         try {
@@ -161,9 +215,8 @@ public class ServerConnect {
             inString.close();
             socket.close();
             serverSocket.close();
-            Log.d(LOG_TAG, "server connect close");
         } catch (NullPointerException e) {
-            Log.e(LOG_TAG, "closing streams error: " + e);
+            Log.e(LOG_TAG, "socket stream is null");
         }
     }
 
