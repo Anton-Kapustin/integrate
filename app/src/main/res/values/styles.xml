@@ -8,7 +8,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimary</item>
-        <item name="android:actionBarItemBackground">@color/colorToolBar</item>
+        <item name="actionBarItemBackground">@color/colorToolBar</item>
 
     </style>
     <style name="AppTheme.NoActionBar">

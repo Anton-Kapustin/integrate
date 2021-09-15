@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.dev.toxa.integrate">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.dev.toxa.integrate">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"/>
+    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+        tools:ignore="ProtectedPermissions" />
 
-    <protected-broadcast android:name="android.intent.action.TIME_TICK"/>
+    <protected-broadcast android:name="android.intent.action.TIME_TICK" />
 
     <application
             android:allowBackup="true"
@@ -15,7 +17,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
 
-        <activity android:name=".MainActivity.MainActivity">
+        <activity android:name=".MainActivity.MainActivity" android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,19 +26,7 @@
 
         </activity>
 
-        <service
-                android:name=".Services.MainService"
-                android:enabled="true"
-                android:exported="true">
-        </service>
-        <service
-                android:name=".Services.StatusHwService"
-                android:exported="false">
-        </service>
-        <service
-                android:name=".Services.StatusPhoneHwService"
-                android:exported="false">
-        </service>
+
         <service
                 android:name=".CommandService"
                 android:enabled="true"
@@ -55,7 +45,8 @@
         <activity
                 android:name=".ActivitySharing.ActivitySharing"
                 android:label="@string/title_activity_sharing"
-                android:theme="@style/AppTheme">
+                android:theme="@style/AppTheme"
+                android:exported="true">
 
             <intent-filter android:label="Send to PC">
                 <action android:name="android.intent.action.SEND"/>

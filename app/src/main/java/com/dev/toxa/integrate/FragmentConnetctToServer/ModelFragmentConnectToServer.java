@@ -66,9 +66,7 @@ public class ModelFragmentConnectToServer implements Observer{
     }
 
     public String getCurrentDistr() {
-        if (currentDistr.equals("Debian")) {
-            currentDistr = "debian";
-        } else {
+        if (!currentDistr.matches("Debian|Ubuntu|Linux Mint")) {
             currentDistr = "ic_phonelink_off_black_24dp";
         }
         return currentDistr;

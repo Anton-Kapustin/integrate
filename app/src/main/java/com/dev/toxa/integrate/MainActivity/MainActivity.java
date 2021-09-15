@@ -2,14 +2,14 @@ package com.dev.toxa.integrate.MainActivity;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
+
 import android.util.Log;
 import com.dev.toxa.integrate.FragmentConnetctToServer.MVPfragmentConnectToServer;
 import com.dev.toxa.integrate.FragmentConnetctToServer.PresenterFragmentConnectToServer;
@@ -22,6 +22,7 @@ import com.dev.toxa.integrate.R;
 import com.dev.toxa.integrate.FragmentConnetctToServer.FragmentConnectToServer;
 import com.dev.toxa.integrate.FragmentListServers.FragmentListServers;
 import com.dev.toxa.integrate.FragmentSettings.FragmentSettings;
+import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity implements MVPmain.view, FragmentListServers.CallbackToActivity {
 
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements MVPmain.view, Fra
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tablayout);

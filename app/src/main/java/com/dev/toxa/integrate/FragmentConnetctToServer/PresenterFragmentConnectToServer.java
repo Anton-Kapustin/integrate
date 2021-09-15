@@ -120,7 +120,11 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
 
     public void stopServer() {
         Log.i(LOG_TAG, "method name: " + String.valueOf(Thread.currentThread().getStackTrace()[2].getMethodName()));
-        timer.cancel();
+        try {
+            timer.cancel();
+        } catch (NullPointerException e) {
+            Log.e(LOG_TAG, e.toString());
+        }
         statusConnection = false;
         modelFragmentConnectToServer.setInUse(false);
         view.stopNotifyService();
@@ -134,6 +138,7 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Log.d(LOG_TAG, "Адрес компа: " + message);
                 client.sendToServer(IP, message);
             }
         });
@@ -253,10 +258,14 @@ public class PresenterFragmentConnectToServer implements MVPfragmentConnectToSer
             network = str[str.length - 1];
             network = "SSID: " + network;
             view.updateUiNetwork(network);
-            String back = jsonData.getString("backlight");
-            Double val = Double.valueOf(back);
-            int backlight = val.intValue();
-            view.updateUiBacklight(backlight);
+            String backlight = jsonData.getString("backlight");
+            try {
+                Double backlightData = Double.valueOf(backlight);
+                int backlightValue = backlightData.intValue();
+                view.updateUiBacklight(backlightValue);
+            } catch (NumberFormatException e) {
+                Log.e(LOG_TAG, e.toString());
+            }
             String snd = jsonData.getString("sound").replaceAll("\\D+", "");
             try {
                 int soundVol = Integer.parseInt(snd);

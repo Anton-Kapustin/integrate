@@ -9,6 +9,7 @@ import com.dev.toxa.integrate.LoggingNameClass;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -77,7 +78,7 @@ public class ServiceFindServers extends Service {
             byte[] buffer = new byte[256];
             DatagramPacket udpPacket = new DatagramPacket(buffer, buffer.length);
 //            Log.d(LOG_TAG, "Создан пакет udp");
-            socketBroadcast.setSoTimeout(7000);
+            socketBroadcast.setSoTimeout(10000);
             socketBroadcast.receive(udpPacket);
 //            Log.d(LOG_TAG, "Получен пакет udp");
             String broadcastMessage = new String(buffer, 0, udpPacket.getLength());
@@ -86,7 +87,7 @@ public class ServiceFindServers extends Service {
                 String address = addr.getHostAddress();
                 Log.d(LOG_TAG, "Broadcast получен: " + broadcastMessage + " от: " + address);
                 String[] array = broadcastMessage.split(", ");
-                Log.d(LOG_TAG, array.toString());
+                Log.d(LOG_TAG, Arrays.toString(array));
                 for (int i = 0; i < array.length; i++) {
                     if (array[i].contains("name")) {
                         PCName = array[i].replaceAll("name: ", "");
